@@ -1,24 +1,25 @@
-'use client';
+"use client";
 
-import { cn } from '@/utils';
-import { motion } from 'framer-motion';
-import { AutoSizer } from 'react-virtualized';
+import { cn } from "@/utils";
+import { motion } from "framer-motion";
+import { AutoSizer } from "react-virtualized";
 
-interface MicFFTProps {
+export default function MicFFT({
+  fft,
+  className,
+}: {
   fft: number[];
   className?: string;
-}
-
-export function MicFFT({ fft, className }: MicFFTProps) {
+}) {
   return (
-    <div className="relative size-full">
+    <div className={"relative size-full"}>
       <AutoSizer>
         {({ width, height }) => (
           <motion.svg
             viewBox={`0 0 ${width} ${height}`}
             width={width}
             height={height}
-            className={cn('absolute !inset-0 !size-full', className)}
+            className={cn("absolute !inset-0 !size-full", className)}
           >
             {Array.from({ length: 24 }).map((_, index) => {
               const value = (fft[index] ?? 0) / 4;

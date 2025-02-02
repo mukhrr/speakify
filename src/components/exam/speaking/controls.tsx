@@ -1,113 +1,14 @@
 'use client';
-
-import { useState, useEffect } from 'react';
+import { useVoice } from '@humeai/voice-react';
 import { Button } from '@/components/ui/button';
-import { Toggle } from '@/components/ui/toggle';
 import { Mic, MicOff, Phone } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Toggle } from '@/components/ui/toggle';
+import MicFFT from './mic-fft';
 import { cn } from '@/utils';
-import { MicFFT } from './mic-fft';
-import {
-  initializeEVI,
-  startConversation,
-  stopConversation,
-  disconnectEVI,
-  toggleMute,
-} from '@/lib/hume/client';
 
-interface ExamControlsProps {
-  onPartComplete: () => void;
-}
-
-export function ExamControls({ onPartComplete }: ExamControlsProps) {
-  const [status, setStatus] = useState<
-    'disconnected' | 'connecting' | 'connected'
-  >('disconnected');
-  const [isMuted, setIsMuted] = useState(false);
-  const [micFft, setMicFft] = useState<number[]>(Array(24).fill(0));
-
-  useEffect(() => {
-    return () => {
-      disconnectEVI().catch(console.error);
-    };
-  }, []);
-
-  const handleConnect = async () => {
-    try {
-      setStatus('connecting');
-      await initializeEVI();
-      await startConversation();
-      setStatus('connected');
-    } catch (error) {
-      console.error('Failed to connect:', error);
-      setStatus('disconnected');
-    }
-  };
-
-  const handleDisconnect = async () => {
-    try {
-      await stopConversation();
-      await disconnectEVI();
-      setStatus('disconnected');
-      onPartComplete();
-    } catch (error) {
-      console.error('Failed to disconnect:', error);
-    }
-  };
-
-  const handleMuteToggle = () => {
-    toggleMute();
-    setIsMuted(!isMuted);
-  };
-
-  if (status !== 'connected') {
-    return (
-      <AnimatePresence>
-        <motion.div
-          className="fixed inset-0 grid grid-cols-1 gap-4 bg-background p-4 md:grid-cols-2"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          {/* User Camera Card */}
-          <motion.div
-            className="flex items-center justify-center rounded-lg border bg-card p-4 text-card-foreground shadow-sm"
-            initial={{ scale: 0.5 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0.5 }}
-          >
-            {/* Camera feed will go here */}
-            <div className="flex aspect-video w-full items-center justify-center rounded-md bg-muted">
-              <span className="text-muted-foreground">
-                Camera feed loading...
-              </span>
-            </div>
-          </motion.div>
-
-          {/* Hume AI Chat Card */}
-          <motion.div
-            className="flex flex-col rounded-lg border bg-card p-4 text-card-foreground shadow-sm"
-            initial={{ scale: 0.5 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0.5 }}
-          >
-            <div className="flex flex-1 flex-col items-center justify-center">
-              <Button
-                className="z-50 flex items-center gap-1.5"
-                onClick={handleConnect}
-                disabled={status === 'connecting'}
-              >
-                <Phone className="size-4 opacity-50" strokeWidth={2} />
-                <span>
-                  {status === 'connecting' ? 'Connecting...' : 'Start Call'}
-                </span>
-              </Button>
-            </div>
-          </motion.div>
-        </motion.div>
-      </AnimatePresence>
-    );
-  }
+export default function Controls() {
+  const { disconnect, status, isMuted, unmute, mute, micFft } = useVoice();
 
   return (
     <div
@@ -117,33 +18,63 @@ export function ExamControls({ onPartComplete }: ExamControlsProps) {
       )}
     >
       <AnimatePresence>
-        <motion.div
-          initial={{ y: '100%', opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: '100%', opacity: 0 }}
-          className="flex items-center gap-4 rounded-lg border border-border bg-card p-4 shadow-sm"
-        >
-          <Toggle pressed={!isMuted} onPressedChange={handleMuteToggle}>
-            {isMuted ? (
-              <MicOff className="size-4" />
-            ) : (
-              <Mic className="size-4" />
-            )}
-          </Toggle>
-
-          <div className="relative grid h-8 w-48 shrink grow-0">
-            <MicFFT fft={micFft} className="fill-current" />
-          </div>
-
-          <Button
-            className="flex items-center gap-1"
-            onClick={handleDisconnect}
-            variant="destructive"
+        {status.value === 'connected' ? (
+          <motion.div
+            initial={{
+              y: '100%',
+              opacity: 0,
+            }}
+            animate={{
+              y: 0,
+              opacity: 1,
+            }}
+            exit={{
+              y: '100%',
+              opacity: 0,
+            }}
+            className={
+              'flex items-center gap-4 rounded-lg border border-border bg-card p-4 shadow-sm'
+            }
           >
-            <Phone className="size-4 opacity-50" strokeWidth={2} />
-            <span>End Call</span>
-          </Button>
-        </motion.div>
+            <Toggle
+              pressed={!isMuted}
+              onPressedChange={() => {
+                if (isMuted) {
+                  unmute();
+                } else {
+                  mute();
+                }
+              }}
+            >
+              {isMuted ? (
+                <MicOff className={'size-4'} />
+              ) : (
+                <Mic className={'size-4'} />
+              )}
+            </Toggle>
+
+            <div className={'relative grid h-8 w-48 shrink grow-0'}>
+              <MicFFT fft={micFft} className={'fill-current'} />
+            </div>
+
+            <Button
+              className={'flex items-center gap-1'}
+              onClick={() => {
+                disconnect();
+              }}
+              variant={'destructive'}
+            >
+              <span>
+                <Phone
+                  className={'size-4 opacity-50'}
+                  strokeWidth={2}
+                  stroke={'currentColor'}
+                />
+              </span>
+              <span>End Call</span>
+            </Button>
+          </motion.div>
+        ) : null}
       </AnimatePresence>
     </div>
   );
