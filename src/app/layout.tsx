@@ -7,8 +7,8 @@ import { Toaster } from '@/components/ui/toaster';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Speakify - IELTS Mock Exam Simulator',
-  description: 'Practice IELTS exams with AI-powered speaking assessment',
+  title: 'Speakify IELTS',
+  description: 'AI-powered IELTS exam simulator',
 };
 
 export default function RootLayout({
@@ -21,9 +21,9 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
+          defaultTheme="dark"
+          enableSystem={false}
+          storageKey="speakify-theme"
         >
           {children}
           <Toaster />
