@@ -1,10 +1,12 @@
 'use client';
 import { useVoice } from '@humeai/voice-react';
-import { Button } from '@/components/ui/button';
+import { useEffect } from 'react';
 import { Mic, MicOff, Phone, ArrowRight } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Toggle } from '@/components/ui/toggle';
 import { useRouter } from 'next/navigation';
+
+import { Button } from '@/components/ui/button';
+import { Toggle } from '@/components/ui/toggle';
 import MicFFT from './mic-fft';
 import { cn } from '@/utils';
 
@@ -19,6 +21,7 @@ export default function Controls({
 }: ControlsProps) {
   const { disconnect, status, isMuted, unmute, mute, micFft } = useVoice();
   const router = useRouter();
+  const voice = useVoice();
 
   const handleEndCall = () => {
     const isLastPart = partNumber === 3;
@@ -40,6 +43,15 @@ export default function Controls({
       }
     }
   };
+
+  // Automatically mute/unmute mic based on AI speaking status
+  useEffect(() => {
+    if (voice.isPlaying) {
+      voice.mute();
+    } else if (voice.status.value === 'connected') {
+      voice.unmute();
+    }
+  }, [voice.isPlaying, voice.status.value, voice.mute, voice.unmute]);
 
   return (
     <div
