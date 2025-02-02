@@ -3,8 +3,19 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Phone } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
-export default function StartCall() {
+interface StartCallProps {
+  partNumber: 1 | 2 | 3;
+}
+
+const partTitles = {
+  1: 'Introduction and Interview',
+  2: 'Individual Long Turn',
+  3: 'Two-Way Discussion',
+};
+
+export default function StartCall({ partNumber }: StartCallProps) {
   const { status, connect } = useVoice();
 
   return (
@@ -31,24 +42,30 @@ export default function StartCall() {
                 exit: { scale: 0.5 },
               }}
             >
-              <Button
-                className={'z-50 flex items-center gap-1.5'}
-                onClick={() => {
-                  connect()
-                    .then(() => {})
-                    .catch(() => {})
-                    .finally(() => {});
-                }}
-              >
-                <span>
-                  <Phone
-                    className={'size-4 opacity-50'}
-                    strokeWidth={2}
-                    stroke={'currentColor'}
-                  />
-                </span>
-                <span>Start Speaking Part</span>
-              </Button>
+              <Card className="w-[400px] p-6">
+                <h2 className="mb-4 text-xl font-semibold">
+                  Part {partNumber}: {partTitles[partNumber]}
+                </h2>
+                <ul className="mb-6 list-inside list-disc space-y-2">
+                  <li>Ensure you are in a quiet environment</li>
+                  <li>Check your microphone is working properly</li>
+                  <li>Have your ID ready (if required)</li>
+                  <li>The test will be recorded for assessment</li>
+                </ul>
+                <Button
+                  className={'flex w-full items-center justify-center gap-1.5'}
+                  size="lg"
+                  onClick={() => {
+                    connect()
+                      .then(() => {})
+                      .catch(() => {})
+                      .finally(() => {});
+                  }}
+                >
+                  <Phone className={'size-4 opacity-50'} strokeWidth={2} />
+                  <span>Start Part {partNumber}</span>
+                </Button>
+              </Card>
             </motion.div>
           </AnimatePresence>
         </motion.div>

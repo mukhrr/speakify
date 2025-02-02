@@ -1,14 +1,42 @@
 'use client';
 import { useVoice } from '@humeai/voice-react';
 import { Button } from '@/components/ui/button';
-import { Mic, MicOff, Phone } from 'lucide-react';
+import { Mic, MicOff, Phone, ArrowRight } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Toggle } from '@/components/ui/toggle';
+import { useRouter } from 'next/navigation';
 import MicFFT from './mic-fft';
 import { cn } from '@/utils';
 
-export default function Controls() {
+interface ControlsProps {
+  partNumber: 1 | 2 | 3;
+  onComplete: (partId: number) => void;
+}
+
+export default function Controls({ partNumber, onComplete }: ControlsProps) {
   const { disconnect, status, isMuted, unmute, mute, micFft } = useVoice();
+  const router = useRouter();
+
+  const handleEndCall = () => {
+    const isLastPart = partNumber === 3;
+    const confirmMessage = isLastPart
+      ? 'Are you sure you want to end the speaking test? This will complete Part 3.'
+      : `Are you sure you want to end Part ${partNumber}? You will proceed to Part ${partNumber + 1}.`;
+
+    const confirmed = window.confirm(confirmMessage);
+
+    if (confirmed) {
+      disconnect();
+      onComplete(partNumber);
+
+      // Navigate to results page if it's the last part, otherwise go back to overview
+      if (isLastPart) {
+        router.push('/exam/speaking/results');
+      } else {
+        router.push('/exam/speaking');
+      }
+    }
+  };
 
   return (
     <div
@@ -58,20 +86,22 @@ export default function Controls() {
             </div>
 
             <Button
-              className={'flex items-center gap-1'}
-              onClick={() => {
-                disconnect();
-              }}
-              variant={'destructive'}
+              className={'flex items-center gap-1.5'}
+              onClick={handleEndCall}
+              variant={partNumber === 3 ? 'destructive' : 'default'}
             >
               <span>
-                <Phone
-                  className={'size-4 opacity-50'}
-                  strokeWidth={2}
-                  stroke={'currentColor'}
-                />
+                {partNumber === 3 ? (
+                  <Phone className={'size-4 opacity-50'} strokeWidth={2} />
+                ) : (
+                  <ArrowRight className={'size-4 opacity-50'} strokeWidth={2} />
+                )}
               </span>
-              <span>End Call</span>
+              <span>
+                {partNumber === 3
+                  ? 'End Speaking Test'
+                  : 'I am Done, Next Section'}
+              </span>
             </Button>
           </motion.div>
         ) : null}

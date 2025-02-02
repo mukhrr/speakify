@@ -5,13 +5,11 @@ import { fetchAccessToken } from 'hume';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import Chat from '@/components/exam/speaking/chat';
+import { SpeakingParts } from '@/components/exam/speaking/speaking-parts';
 // import { Timer } from '@/components/exam/speaking/timer';
 
 export default function SpeakingExamPage() {
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [isExamStarted, setIsExamStarted] = useState(false);
-  // const [examPart, setExamPart] = useState<1 | 2 | 3>(1);
 
   useEffect(() => {
     // In a real app, this should be done server-side
@@ -48,28 +46,7 @@ export default function SpeakingExamPage() {
         </p>
       </div>
 
-      {!isExamStarted ? (
-        <Card className="p-6">
-          <h2 className="mb-4 text-xl font-semibold">Before You Start</h2>
-          <ul className="mb-6 list-inside list-disc space-y-2">
-            <li>Ensure you are in a quiet environment</li>
-            <li>Check your microphone is working properly</li>
-            <li>Have your ID ready (if required)</li>
-            <li>The test will be recorded for assessment</li>
-          </ul>
-          <Button
-            onClick={() => setIsExamStarted(true)}
-            size="lg"
-            className="w-full"
-          >
-            Start Speaking Test
-          </Button>
-        </Card>
-      ) : (
-        <div className={'flex grow flex-col'}>
-          <Chat accessToken={accessToken} />
-        </div>
-      )}
+      <SpeakingParts accessToken={accessToken} />
     </div>
   );
 }

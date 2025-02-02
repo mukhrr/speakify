@@ -9,9 +9,10 @@ import Expressions from './expressions';
 
 interface MessagesProps {
   ref?: Ref<HTMLDivElement>;
+  partNumber: 1 | 2 | 3;
 }
 
-const Messages = ({ ref }: MessagesProps) => {
+const Messages = ({ ref, partNumber }: MessagesProps) => {
   const { messages } = useVoice();
 
   return (
