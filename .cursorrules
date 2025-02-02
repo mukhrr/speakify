@@ -1,0 +1,29 @@
+{
+    "typescript": true,
+    "tailwindcss": true,
+    "format": {
+        "indentSize": 2,
+        "singleQuote": true,
+        "semi": true,
+        "trailingComma": "es5"
+    },
+    "linting": {
+        "eslint": true,
+        "strict": true
+    },
+    "nextjs": {
+        "appDir": true,
+        "strictMode": true
+    },
+    "folders": {
+        "components": "src/components",
+        "pages": "src/app",
+        "styles": "src/styles",
+        "utils": "src/utils",
+        "types": "src/types",
+        "lib": "src/lib",
+        "hooks": "src/hooks",
+        "constants": "src/constants",
+        "services": "src/services"
+    }
+}
