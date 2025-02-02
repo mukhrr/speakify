@@ -66,7 +66,9 @@ export default function SpeakingExamPage() {
           </Button>
         </Card>
       ) : (
-        <Chat accessToken={accessToken} />
+        <div className={'flex grow flex-col'}>
+          <Chat accessToken={accessToken} />
+        </div>
       )}
     </div>
   );

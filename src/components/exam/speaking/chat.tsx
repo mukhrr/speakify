@@ -1,10 +1,10 @@
 'use client';
 
-import { ComponentRef, useRef } from 'react';
+import { useRef } from 'react';
 import { VoiceProvider } from '@humeai/voice-react';
 
 import Messages from './messages';
-import Call from './controls';
+import Controls from './controls';
 import StartCall from './start-call';
 
 export default function ClientComponent({
@@ -13,30 +13,25 @@ export default function ClientComponent({
   accessToken: string;
 }) {
   const timeout = useRef<number | null>(null);
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  // optional: use configId from environment variable
-  const configId = process.env['NEXT_PUBLIC_HUME_CONFIG_ID'];
+  const messagesRef = useRef<HTMLDivElement>(null);
 
   return (
     <div
       className={
-        'relative mx-auto flex h-[0px] w-full grow flex-col overflow-hidden'
+        'relative mx-auto flex h-full w-full grow flex-col overflow-hidden'
       }
     >
       <VoiceProvider
         auth={{ type: 'accessToken', value: accessToken }}
-        configId={configId}
         onMessage={() => {
           if (timeout.current) {
             window.clearTimeout(timeout.current);
           }
 
           timeout.current = window.setTimeout(() => {
-            if (ref.current) {
-              const scrollHeight = ref.current.scrollHeight;
-
-              ref.current.scrollTo({
+            if (messagesRef.current) {
+              const scrollHeight = messagesRef.current.scrollHeight;
+              messagesRef.current.scrollTo({
                 top: scrollHeight,
                 behavior: 'smooth',
               });
@@ -44,8 +39,8 @@ export default function ClientComponent({
           }, 200);
         }}
       >
-        <Messages ref={ref} />
-        <Call />
+        <Messages ref={messagesRef} />
+        <Controls />
         <StartCall />
       </VoiceProvider>
     </div>
