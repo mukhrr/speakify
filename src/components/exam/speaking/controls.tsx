@@ -64,26 +64,45 @@ export function ExamControls({ onPartComplete }: ExamControlsProps) {
     return (
       <AnimatePresence>
         <motion.div
-          className="fixed inset-0 flex items-center justify-center bg-background p-4"
+          className="fixed inset-0 grid grid-cols-1 gap-4 bg-background p-4 md:grid-cols-2"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
+          {/* User Camera Card */}
           <motion.div
+            className="flex items-center justify-center rounded-lg border bg-card p-4 text-card-foreground shadow-sm"
             initial={{ scale: 0.5 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0.5 }}
           >
-            <Button
-              className="z-50 flex items-center gap-1.5"
-              onClick={handleConnect}
-              disabled={status === 'connecting'}
-            >
-              <Phone className="size-4 opacity-50" strokeWidth={2} />
-              <span>
-                {status === 'connecting' ? 'Connecting...' : 'Start Call'}
+            {/* Camera feed will go here */}
+            <div className="flex aspect-video w-full items-center justify-center rounded-md bg-muted">
+              <span className="text-muted-foreground">
+                Camera feed loading...
               </span>
-            </Button>
+            </div>
+          </motion.div>
+
+          {/* Hume AI Chat Card */}
+          <motion.div
+            className="flex flex-col rounded-lg border bg-card p-4 text-card-foreground shadow-sm"
+            initial={{ scale: 0.5 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0.5 }}
+          >
+            <div className="flex flex-1 flex-col items-center justify-center">
+              <Button
+                className="z-50 flex items-center gap-1.5"
+                onClick={handleConnect}
+                disabled={status === 'connecting'}
+              >
+                <Phone className="size-4 opacity-50" strokeWidth={2} />
+                <span>
+                  {status === 'connecting' ? 'Connecting...' : 'Start Call'}
+                </span>
+              </Button>
+            </div>
           </motion.div>
         </motion.div>
       </AnimatePresence>
