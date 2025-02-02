@@ -1,16 +1,17 @@
 'use client';
 
+import { Ref } from 'react';
 import { useVoice } from '@humeai/voice-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ComponentRef, forwardRef } from 'react';
 
 import { cn } from '@/utils';
 import Expressions from './expressions';
 
-const Messages = forwardRef<
-  ComponentRef<typeof motion.div>,
-  Record<never, never>
->(function Messages(_, ref) {
+interface MessagesProps {
+  ref?: Ref<HTMLDivElement>;
+}
+
+const Messages = ({ ref }: MessagesProps) => {
   const { messages } = useVoice();
 
   return (
@@ -69,6 +70,6 @@ const Messages = forwardRef<
       </motion.div>
     </motion.div>
   );
-});
+};
 
 export default Messages;

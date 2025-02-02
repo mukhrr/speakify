@@ -15,6 +15,22 @@ export default function ClientComponent({
   const timeout = useRef<number | null>(null);
   const messagesRef = useRef<HTMLDivElement>(null);
 
+  const onMessage = () => {
+    if (timeout.current) {
+      window.clearTimeout(timeout.current);
+    }
+
+    timeout.current = window.setTimeout(() => {
+      if (messagesRef.current) {
+        const scrollHeight = messagesRef.current.scrollHeight;
+        messagesRef.current.scrollTo({
+          top: scrollHeight,
+          behavior: 'smooth',
+        });
+      }
+    }, 200);
+  };
+
   return (
     <div
       className={
@@ -23,21 +39,7 @@ export default function ClientComponent({
     >
       <VoiceProvider
         auth={{ type: 'accessToken', value: accessToken }}
-        onMessage={() => {
-          if (timeout.current) {
-            window.clearTimeout(timeout.current);
-          }
-
-          timeout.current = window.setTimeout(() => {
-            if (messagesRef.current) {
-              const scrollHeight = messagesRef.current.scrollHeight;
-              messagesRef.current.scrollTo({
-                top: scrollHeight,
-                behavior: 'smooth',
-              });
-            }
-          }, 200);
-        }}
+        onMessage={onMessage}
       >
         <Messages ref={messagesRef} />
         <Controls />
