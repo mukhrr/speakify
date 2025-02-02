@@ -137,5 +137,76 @@ export function ExamMessages({ part }: ExamMessagesProps) {
     }
   };
 
-  return <div className="min-h-[200px]">{renderContent()}</div>;
+  return (
+    <div className="space-y-4">
+      {part === 1 && (
+        <>
+          <p className="text-muted-foreground">
+            The AI examiner will ask you general questions about yourself.
+            Please respond naturally and provide detailed answers.
+          </p>
+          <div className="rounded-lg bg-secondary p-4">
+            <p className="text-secondary-foreground">
+              Sample questions the examiner might ask:
+            </p>
+            <ul className="mt-2 list-inside list-disc text-muted-foreground">
+              <li>Can you tell me about your hometown?</li>
+              <li>What do you do for work or study?</li>
+              <li>What are your hobbies and interests?</li>
+            </ul>
+          </div>
+        </>
+      )}
+
+      {part === 2 && (
+        <>
+          <p className="text-muted-foreground">
+            The AI examiner will give you a topic to speak about for 1-2
+            minutes. You will have 1 minute to prepare your response.
+          </p>
+          <div className="rounded-lg bg-secondary p-4">
+            <p className="text-secondary-foreground">Topic Card Example:</p>
+            <div className="mt-2 text-muted-foreground">
+              <p>Describe a place you like to visit in your free time.</p>
+              <p className="mt-2">You should say:</p>
+              <ul className="list-inside list-disc">
+                <li>Where it is</li>
+                <li>When you usually go there</li>
+                <li>What you do there</li>
+                <li>Why you like going there</li>
+              </ul>
+            </div>
+          </div>
+        </>
+      )}
+
+      {part === 3 && (
+        <>
+          <p className="text-muted-foreground">
+            The AI examiner will ask you more abstract questions related to the
+            topic from Part 2. Express your opinions and provide examples to
+            support your answers.
+          </p>
+          <div className="rounded-lg bg-secondary p-4">
+            <p className="text-secondary-foreground">
+              Sample follow-up questions:
+            </p>
+            <ul className="mt-2 list-inside list-disc text-muted-foreground">
+              <li>
+                What are the advantages and disadvantages of different types of
+                leisure activities?
+              </li>
+              <li>
+                How have people's leisure activities changed in recent years?
+              </li>
+              <li>
+                Do you think the way people spend their free time will be
+                different in the future?
+              </li>
+            </ul>
+          </div>
+        </>
+      )}
+    </div>
+  );
 }

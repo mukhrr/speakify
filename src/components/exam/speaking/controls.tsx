@@ -1,100 +1,167 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Mic, MicOff, Loader2, Square } from 'lucide-react';
-import { analyzeAudio, humeConfig } from '@/lib/hume/client';
+import { Video, Square, Loader2 } from 'lucide-react';
+import {
+  initializeEVI,
+  startConversation,
+  stopConversation,
+  disconnectEVI,
+} from '@/lib/hume/client';
 
 interface ExamControlsProps {
   onPartComplete: () => void;
 }
 
 export function ExamControls({ onPartComplete }: ExamControlsProps) {
-  const [isRecording, setIsRecording] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
-    null
-  );
-  const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
+  const [isActive, setIsActive] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
-  const startRecording = async () => {
+  useEffect(() => {
+    return () => {
+      // Cleanup on unmount
+      stopConversation().catch(console.error);
+      disconnectEVI().catch(console.error);
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, []);
+
+  const startSession = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
+      setIsInitializing(true);
 
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          setAudioChunks((chunks) => [...chunks, e.data]);
-        }
-      };
+      // Initialize camera
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: {
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          facingMode: 'user',
+        },
+      });
 
-      recorder.onstop = async () => {
-        setIsProcessing(true);
-        try {
-          const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-          const result = await analyzeAudio(audioBlob, humeConfig);
-          console.log('Hume Analysis Result:', result);
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
 
-          // Reset audio chunks for next recording
-          setAudioChunks([]);
-        } catch (error) {
-          console.error('Hume analysis error:', error);
-        } finally {
-          setIsProcessing(false);
-        }
-      };
+      // Initialize Hume EVI
+      await initializeEVI();
+      await startConversation();
 
-      setMediaRecorder(recorder);
-      recorder.start();
-      setIsRecording(true);
+      setIsActive(true);
     } catch (error) {
-      console.error('Failed to start recording:', error);
+      console.error('Failed to start session:', error);
+    } finally {
+      setIsInitializing(false);
     }
   };
 
-  const stopRecording = () => {
-    if (mediaRecorder && isRecording) {
-      mediaRecorder.stop();
-      const tracks = mediaRecorder.stream.getTracks();
-      tracks.forEach((track) => track.stop());
-      setIsRecording(false);
+  const endSession = async () => {
+    try {
+      await stopConversation();
+      await disconnectEVI();
+
+      // Stop camera
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+      }
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
+
+      setIsActive(false);
       onPartComplete();
+    } catch (error) {
+      console.error('Failed to end session:', error);
     }
   };
 
-  const handleRecordToggle = () => {
-    if (isRecording) {
-      stopRecording();
+  const handleSessionToggle = () => {
+    if (isActive) {
+      endSession();
     } else {
-      startRecording();
+      startSession();
     }
   };
 
   return (
-    <div className="mt-6 flex items-center justify-end space-x-4">
-      <Button
-        onClick={handleRecordToggle}
-        size="lg"
-        variant={isRecording ? 'destructive' : 'default'}
-        className="shadow-glow hover:shadow-glow-md"
-      >
-        {isProcessing ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Processing...
-          </>
-        ) : isRecording ? (
-          <>
-            <Square className="mr-2 h-4 w-4" />
-            Stop Recording
-          </>
-        ) : (
-          <>
-            <Mic className="mr-2 h-4 w-4" />
-            Start Recording
-          </>
-        )}
-      </Button>
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        {/* User's video feed */}
+        <div className="shadow-glow relative aspect-video w-full overflow-hidden rounded-lg bg-secondary">
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            className={`h-full w-full object-cover ${
+              isActive ? 'opacity-100' : 'opacity-0'
+            }`}
+          />
+          {!isActive && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <p className="text-muted-foreground">
+                Your video feed will appear here
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* AI Examiner visualization */}
+        <div className="shadow-glow relative aspect-video w-full overflow-hidden rounded-lg bg-secondary">
+          {isActive ? (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center">
+                <h3 className="text-lg font-semibold text-primary">
+                  AI Examiner
+                </h3>
+                <p className="text-muted-foreground">
+                  Speaking with you in real-time
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <p className="text-muted-foreground">
+                AI examiner will appear here
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="flex justify-end space-x-4">
+        <Button
+          onClick={handleSessionToggle}
+          size="lg"
+          variant={isActive ? 'destructive' : 'default'}
+          className="shadow-glow hover:shadow-glow-md"
+          disabled={isInitializing}
+        >
+          {isInitializing ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Initializing...
+            </>
+          ) : isActive ? (
+            <>
+              <Square className="mr-2 h-4 w-4" />
+              End Session
+            </>
+          ) : (
+            <>
+              <Video className="mr-2 h-4 w-4" />
+              Start Session
+            </>
+          )}
+        </Button>
+      </div>
     </div>
   );
 }

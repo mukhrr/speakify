@@ -1,100 +1,166 @@
-import { HumeClient } from 'hume';
+import { fetchAccessToken } from 'hume';
 
-const HUME_API_ENDPOINT = 'https://api.hume.ai/v0';
-
-export const createHumeClient = () => {
-  const apiKey = process.env.NEXT_PUBLIC_HUME_API_KEY;
-  const secretKey = process.env.NEXT_PUBLIC_HUME_SECRET_KEY;
-
-  if (!apiKey || !secretKey) {
-    throw new Error('Hume API credentials are not defined');
-  }
-
-  return new HumeClient({
-    apiKey,
-    secretKey,
-  });
-};
-
-export async function analyzeAudio(audioBlob: Blob, config: any) {
-  const apiKey = process.env.NEXT_PUBLIC_HUME_API_KEY;
-
-  if (!apiKey) {
-    throw new Error('Hume API key is not defined');
-  }
-
-  // Create form data
-  const formData = new FormData();
-  formData.append('file', audioBlob, 'recording.wav');
-  formData.append('config', JSON.stringify(config));
-
-  // Send request to Hume API
-  const response = await fetch(`${HUME_API_ENDPOINT}/batch/jobs`, {
-    method: 'POST',
-    headers: {
-      'X-Hume-Api-Key': apiKey,
-    },
-    body: formData,
-  });
-
-  if (!response.ok) {
-    throw new Error(`Hume API error: ${response.statusText}`);
-  }
-
-  const job = await response.json();
-
-  // Poll for job completion
-  const result = await pollJobCompletion(job.job_id, apiKey);
-  return result;
-}
-
-async function pollJobCompletion(jobId: string, apiKey: string) {
-  const maxAttempts = 30;
-  const interval = 2000; // 2 seconds
-
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    const response = await fetch(`${HUME_API_ENDPOINT}/batch/jobs/${jobId}`, {
-      headers: {
-        'X-Hume-Api-Key': apiKey,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to check job status: ${response.statusText}`);
-    }
-
-    const status = await response.json();
-
-    if (status.state === 'completed') {
-      return status.results;
-    } else if (status.state === 'failed') {
-      throw new Error('Job processing failed');
-    }
-
-    // Wait before next attempt
-    await new Promise((resolve) => setTimeout(resolve, interval));
-  }
-
-  throw new Error('Job timed out');
-}
-
-export const humeConfig = {
+interface Message {
+  type: 'user_message' | 'assistant_message';
+  message: {
+    role: string;
+    content: string;
+  };
   models: {
-    prosody: {
-      identify_speakers: true,
-      granularity: 'utterance',
-      window: {
-        length: 4,
-        step: 1,
-      },
-    },
-    language: {
-      granularity: 'utterance',
-      identify_speakers: true,
-    },
-    emotion: {
-      granularity: 'utterance',
-      identify_speakers: true,
-    },
-  },
+    prosody?: {
+      scores: Record<string, number>;
+    };
+  };
+}
+
+interface VoiceState {
+  status: {
+    value: 'disconnected' | 'connecting' | 'connected';
+  };
+  isMuted: boolean;
+  messages: Message[];
+  micFft: number[];
+}
+
+let voiceState: VoiceState = {
+  status: { value: 'disconnected' },
+  isMuted: false,
+  messages: [],
+  micFft: Array(24).fill(0),
 };
+
+let ws: WebSocket | null = null;
+
+export const getHumeAccessToken = async () => {
+  const accessToken = await fetchAccessToken({
+    apiKey: String(process.env.NEXT_PUBLIC_HUME_API_KEY),
+    secretKey: String(process.env.NEXT_PUBLIC_HUME_SECRET_KEY),
+  });
+
+  if (accessToken === 'undefined') {
+    return null;
+  }
+
+  return accessToken ?? null;
+};
+
+export const initializeEVI = async () => {
+  const accessToken = await getHumeAccessToken();
+  if (!accessToken) {
+    throw new Error('Failed to get Hume access token');
+  }
+
+  const configId = process.env.NEXT_PUBLIC_HUME_CONFIG_ID;
+  const wsUrl = `wss://api.hume.ai/v0/stream/models?config_id=${configId}`;
+
+  ws = new WebSocket(wsUrl);
+
+  ws.onopen = () => {
+    ws?.send(JSON.stringify({ type: 'auth', accessToken }));
+    voiceState.status.value = 'connected';
+  };
+
+  ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    handleWebSocketMessage(data);
+  };
+
+  ws.onerror = (error) => {
+    console.error('WebSocket error:', error);
+    voiceState.status.value = 'disconnected';
+  };
+
+  ws.onclose = () => {
+    voiceState.status.value = 'disconnected';
+  };
+};
+
+export const startConversation = async () => {
+  if (voiceState.status.value !== 'connected') {
+    throw new Error('EVI not connected');
+  }
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const audioContext = new AudioContext();
+    const source = audioContext.createMediaStreamSource(stream);
+    const processor = audioContext.createScriptProcessor(1024, 1, 1);
+
+    source.connect(processor);
+    processor.connect(audioContext.destination);
+
+    processor.onaudioprocess = (e) => {
+      if (ws && ws.readyState === WebSocket.OPEN && !voiceState.isMuted) {
+        const audioData = e.inputBuffer.getChannelData(0);
+        // Convert audio data to format expected by Hume
+        const buffer = convertAudioData(audioData);
+        ws.send(buffer);
+      }
+    };
+
+    // Update FFT data for visualization
+    const analyser = audioContext.createAnalyser();
+    analyser.fftSize = 256;
+    source.connect(analyser);
+
+    const updateFFT = () => {
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
+      analyser.getByteFrequencyData(dataArray);
+      voiceState.micFft = Array.from(dataArray).slice(0, 24);
+      requestAnimationFrame(updateFFT);
+    };
+    updateFFT();
+  } catch (error) {
+    console.error('Failed to start audio stream:', error);
+    throw error;
+  }
+};
+
+export const stopConversation = async () => {
+  if (ws) {
+    ws.close();
+    ws = null;
+  }
+  voiceState.status.value = 'disconnected';
+};
+
+export const disconnectEVI = async () => {
+  await stopConversation();
+  voiceState = {
+    status: { value: 'disconnected' },
+    isMuted: false,
+    messages: [],
+    micFft: Array(24).fill(0),
+  };
+};
+
+export const toggleMute = () => {
+  voiceState.isMuted = !voiceState.isMuted;
+};
+
+function handleWebSocketMessage(data: any) {
+  if (data.type === 'prosody') {
+    const message: Message = {
+      type: 'user_message',
+      message: {
+        role: 'user',
+        content: data.text || '',
+      },
+      models: {
+        prosody: {
+          scores: data.predictions || {},
+        },
+      },
+    };
+    voiceState.messages.push(message);
+  }
+}
+
+function convertAudioData(audioData: Float32Array): ArrayBuffer {
+  // Convert Float32Array to Int16Array for more efficient transmission
+  const int16Data = new Int16Array(audioData.length);
+  for (let i = 0; i < audioData.length; i++) {
+    int16Data[i] = audioData[i] * 32767;
+  }
+  return int16Data.buffer;
+}

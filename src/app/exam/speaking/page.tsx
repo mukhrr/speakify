@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ExamControls } from '@/components/exam/speaking/controls';
@@ -22,36 +22,41 @@ export default function SpeakingExamPage() {
       </div>
 
       {!isExamStarted ? (
-        <Card className="border-border bg-card p-6">
+        <Card className="shadow-glow border-border bg-card p-6">
           <h2 className="mb-4 text-xl font-semibold text-card-foreground">
             Before You Start
           </h2>
           <ul className="mb-6 list-inside list-disc space-y-2 text-muted-foreground">
             <li>Ensure you are in a quiet environment</li>
-            <li>Check your microphone is working properly</li>
+            <li>Check your camera and microphone are working properly</li>
+            <li>Position yourself in a well-lit area facing the camera</li>
             <li>Have your ID ready (if required)</li>
-            <li>The test will be recorded for assessment</li>
+            <li>The session will be recorded for assessment</li>
           </ul>
           <Button
             onClick={() => setIsExamStarted(true)}
             size="lg"
-            className="w-full"
+            className="shadow-glow hover:shadow-glow-md w-full"
           >
             Start Speaking Test
           </Button>
         </Card>
       ) : (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <Card className="col-span-2 border-border bg-card p-6">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-card-foreground">
-                Part {examPart} {examPart === 1 && '- Introduction & Interview'}
-                {examPart === 2 && '- Individual Long Turn'}
-                {examPart === 3 && '- Two-Way Discussion'}
-              </h2>
-              <Timer isRunning={isExamStarted} />
-            </div>
-            <ExamMessages part={examPart} />
+          <div className="space-y-6 lg:col-span-2">
+            <Card className="shadow-glow border-border bg-card p-6">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-card-foreground">
+                  Part {examPart}{' '}
+                  {examPart === 1 && '- Introduction & Interview'}
+                  {examPart === 2 && '- Individual Long Turn'}
+                  {examPart === 3 && '- Two-Way Discussion'}
+                </h2>
+                <Timer isRunning={isExamStarted} />
+              </div>
+              <ExamMessages part={examPart} />
+            </Card>
+
             <ExamControls
               onPartComplete={() => {
                 if (examPart < 3) {
@@ -59,9 +64,9 @@ export default function SpeakingExamPage() {
                 }
               }}
             />
-          </Card>
+          </div>
 
-          <Card className="border-border bg-card p-6">
+          <Card className="shadow-glow border-border bg-card p-6">
             <h3 className="mb-4 text-lg font-semibold text-card-foreground">
               Part {examPart} Info
             </h3>
