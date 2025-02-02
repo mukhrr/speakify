@@ -10,13 +10,13 @@ import StartCall from './start-call';
 interface ChatProps {
   accessToken: string;
   partNumber: 1 | 2 | 3;
-  onComplete: (partId: number) => void;
+  onCompleteAction: (partId: number) => void;
 }
 
 export default function Chat({
   accessToken,
   partNumber,
-  onComplete,
+  onCompleteAction,
 }: ChatProps) {
   const timeout = useRef<number | null>(null);
   const messagesRef = useRef<HTMLDivElement>(null);
@@ -48,7 +48,7 @@ export default function Chat({
         onMessage={onMessage}
       >
         <Messages ref={messagesRef} partNumber={partNumber} />
-        <Controls partNumber={partNumber} onComplete={onComplete} />
+        <Controls partNumber={partNumber} onCompleteAction={onCompleteAction} />
         <StartCall partNumber={partNumber} />
       </VoiceProvider>
     </div>

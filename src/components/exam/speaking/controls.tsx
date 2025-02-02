@@ -10,10 +10,13 @@ import { cn } from '@/utils';
 
 interface ControlsProps {
   partNumber: 1 | 2 | 3;
-  onComplete: (partId: number) => void;
+  onCompleteAction: (partId: number) => void;
 }
 
-export default function Controls({ partNumber, onComplete }: ControlsProps) {
+export default function Controls({
+  partNumber,
+  onCompleteAction,
+}: ControlsProps) {
   const { disconnect, status, isMuted, unmute, mute, micFft } = useVoice();
   const router = useRouter();
 
@@ -27,7 +30,7 @@ export default function Controls({ partNumber, onComplete }: ControlsProps) {
 
     if (confirmed) {
       disconnect();
-      onComplete(partNumber);
+      onCompleteAction(partNumber);
 
       // Navigate to results page if it's the last part, otherwise go back to overview
       if (isLastPart) {

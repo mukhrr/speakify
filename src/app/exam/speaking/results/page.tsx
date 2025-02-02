@@ -73,10 +73,13 @@ export default function ResultsPage() {
         <Button
           variant="outline"
           className="flex items-center gap-2"
-          onClick={() => router.push('/exam/speaking')}
+          onClick={() => {
+            router.replace('/');
+            localStorage.removeItem('speaking-parts-status');
+          }}
         >
           <ArrowLeft className="size-4" />
-          Back to Overview
+          Back to Main Page
         </Button>
       </div>
 

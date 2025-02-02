@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { ChartBar } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import Chat from './chat';
 
 interface SpeakingPartsProps {
@@ -101,6 +102,13 @@ export function SpeakingParts({ accessToken }: SpeakingPartsProps) {
   const allPartsCompleted = parts.every((part) => part.status === 'completed');
   const hasInProgressPart = parts.some((part) => part.status === 'in-progress');
 
+  // Check if previous parts are completed
+  const isPreviousPartsCompleted = (partId: number) => {
+    return parts
+      .filter((p) => p.id < partId)
+      .every((p) => p.status === 'completed');
+  };
+
   if (activePart) {
     return (
       <div className="space-y-4">
@@ -111,7 +119,7 @@ export function SpeakingParts({ accessToken }: SpeakingPartsProps) {
           <Chat
             accessToken={accessToken}
             partNumber={activePart.id}
-            onComplete={handleCompletePart}
+            onCompleteAction={handleCompletePart}
           />
         </div>
       </div>
@@ -130,18 +138,21 @@ export function SpeakingParts({ accessToken }: SpeakingPartsProps) {
                 <p className="text-sm text-gray-500">
                   Duration: {part.duration}
                 </p>
-                {part.status === 'not-started' && !hasInProgressPart && (
-                  <p className="text-sm text-yellow-600">
-                    Note: The conversation will start immediately when you click
-                    Start
-                  </p>
-                )}
+                {part.status === 'not-started' &&
+                  !isPreviousPartsCompleted(part.id) && (
+                    <p className="text-sm text-muted-foreground">
+                      Complete previous {part.id === 3 ? 'parts' : 'part'} to
+                      unlock
+                    </p>
+                  )}
               </div>
               <Button
                 onClick={() => handleStartPart(part)}
                 disabled={
                   (part.status === 'completed' && !allPartsCompleted) ||
-                  (hasInProgressPart && part.status !== 'in-progress')
+                  (hasInProgressPart && part.status !== 'in-progress') ||
+                  (!isPreviousPartsCompleted(part.id) &&
+                    part.status !== 'completed')
                 }
                 variant={part.status === 'completed' ? 'outline' : 'default'}
               >
@@ -149,7 +160,9 @@ export function SpeakingParts({ accessToken }: SpeakingPartsProps) {
                   ? '✓ Completed'
                   : part.status === 'in-progress'
                     ? 'Continue Conversation'
-                    : 'Start Conversation'}
+                    : !isPreviousPartsCompleted(part.id)
+                      ? 'Locked'
+                      : 'Start Conversation'}
               </Button>
             </div>
           </Card>
@@ -161,7 +174,7 @@ export function SpeakingParts({ accessToken }: SpeakingPartsProps) {
           <Button
             size="lg"
             className="flex items-center gap-2"
-            onClick={() => router.push('/exam/speaking/results')}
+            onClick={() => router.replace('/exam/speaking/results')}
           >
             <ChartBar className="size-4" />
             See Your Results
