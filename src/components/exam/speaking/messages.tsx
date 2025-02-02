@@ -2,6 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/utils';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ComponentRef, forwardRef } from 'react';
+import { Expressions } from './expressions';
 
 interface ExamMessagesProps {
   part: 1 | 2 | 3;
@@ -43,6 +47,69 @@ const part3Questions = [
   'How do you think education will change in the future?',
   'What role does technology play in learning new skills?',
 ];
+
+interface Message {
+  type: 'user_message' | 'assistant_message';
+  message: {
+    role: string;
+    content: string;
+  };
+  models: {
+    prosody?: {
+      scores: Record<string, number>;
+    };
+  };
+}
+
+interface MessagesProps {
+  messages: Message[];
+}
+
+export const Messages = forwardRef<
+  ComponentRef<typeof motion.div>,
+  MessagesProps
+>(function Messages({ messages }, ref) {
+  return (
+    <motion.div
+      layoutScroll
+      className="grow overflow-auto rounded-md p-4"
+      ref={ref}
+    >
+      <motion.div className="mx-auto flex w-full max-w-2xl flex-col gap-4 pb-24">
+        <AnimatePresence mode="popLayout">
+          {messages.map((msg, index) => {
+            if (
+              msg.type === 'user_message' ||
+              msg.type === 'assistant_message'
+            ) {
+              return (
+                <motion.div
+                  key={msg.type + index}
+                  className={cn(
+                    'w-[80%]',
+                    'bg-card',
+                    'rounded border border-border',
+                    msg.type === 'user_message' ? 'ml-auto' : ''
+                  )}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 0 }}
+                >
+                  <div className="px-3 pt-4 text-xs font-medium capitalize leading-none opacity-50">
+                    {msg.message.role}
+                  </div>
+                  <div className="px-3 pb-3">{msg.message.content}</div>
+                  <Expressions values={{ ...msg.models.prosody?.scores }} />
+                </motion.div>
+              );
+            }
+            return null;
+          })}
+        </AnimatePresence>
+      </motion.div>
+    </motion.div>
+  );
+});
 
 export function ExamMessages({ part }: ExamMessagesProps) {
   const [currentQuestion, setCurrentQuestion] = useState(0);

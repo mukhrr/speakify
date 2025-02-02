@@ -1,13 +1,18 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Video, Square, Loader2 } from 'lucide-react';
+import { Toggle } from '@/components/ui/toggle';
+import { Mic, MicOff, Phone } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { cn } from '@/utils';
+import { MicFFT } from './mic-fft';
 import {
   initializeEVI,
   startConversation,
   stopConversation,
   disconnectEVI,
+  toggleMute,
 } from '@/lib/hume/client';
 
 interface ExamControlsProps {
@@ -15,153 +20,112 @@ interface ExamControlsProps {
 }
 
 export function ExamControls({ onPartComplete }: ExamControlsProps) {
-  const [isActive, setIsActive] = useState(false);
-  const [isInitializing, setIsInitializing] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+  const [status, setStatus] = useState<
+    'disconnected' | 'connecting' | 'connected'
+  >('disconnected');
+  const [isMuted, setIsMuted] = useState(false);
+  const [micFft, setMicFft] = useState<number[]>(Array(24).fill(0));
 
   useEffect(() => {
     return () => {
-      // Cleanup on unmount
-      stopConversation().catch(console.error);
       disconnectEVI().catch(console.error);
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
-      }
     };
   }, []);
 
-  const startSession = async () => {
+  const handleConnect = async () => {
     try {
-      setIsInitializing(true);
-
-      // Initialize camera
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: {
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-          facingMode: 'user',
-        },
-      });
-
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
-
-      // Initialize Hume EVI
+      setStatus('connecting');
       await initializeEVI();
       await startConversation();
-
-      setIsActive(true);
+      setStatus('connected');
     } catch (error) {
-      console.error('Failed to start session:', error);
-    } finally {
-      setIsInitializing(false);
+      console.error('Failed to connect:', error);
+      setStatus('disconnected');
     }
   };
 
-  const endSession = async () => {
+  const handleDisconnect = async () => {
     try {
       await stopConversation();
       await disconnectEVI();
-
-      // Stop camera
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
-      }
-      if (videoRef.current) {
-        videoRef.current.srcObject = null;
-      }
-
-      setIsActive(false);
+      setStatus('disconnected');
       onPartComplete();
     } catch (error) {
-      console.error('Failed to end session:', error);
+      console.error('Failed to disconnect:', error);
     }
   };
 
-  const handleSessionToggle = () => {
-    if (isActive) {
-      endSession();
-    } else {
-      startSession();
-    }
+  const handleMuteToggle = () => {
+    toggleMute();
+    setIsMuted(!isMuted);
   };
+
+  if (status !== 'connected') {
+    return (
+      <AnimatePresence>
+        <motion.div
+          className="fixed inset-0 flex items-center justify-center bg-background p-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div
+            initial={{ scale: 0.5 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0.5 }}
+          >
+            <Button
+              className="z-50 flex items-center gap-1.5"
+              onClick={handleConnect}
+              disabled={status === 'connecting'}
+            >
+              <Phone className="size-4 opacity-50" strokeWidth={2} />
+              <span>
+                {status === 'connecting' ? 'Connecting...' : 'Start Call'}
+              </span>
+            </Button>
+          </motion.div>
+        </motion.div>
+      </AnimatePresence>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        {/* User's video feed */}
-        <div className="shadow-glow relative aspect-video w-full overflow-hidden rounded-lg bg-secondary">
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            muted
-            className={`h-full w-full object-cover ${
-              isActive ? 'opacity-100' : 'opacity-0'
-            }`}
-          />
-          {!isActive && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <p className="text-muted-foreground">
-                Your video feed will appear here
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* AI Examiner visualization */}
-        <div className="shadow-glow relative aspect-video w-full overflow-hidden rounded-lg bg-secondary">
-          {isActive ? (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center">
-                <h3 className="text-lg font-semibold text-primary">
-                  AI Examiner
-                </h3>
-                <p className="text-muted-foreground">
-                  Speaking with you in real-time
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <p className="text-muted-foreground">
-                AI examiner will appear here
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="flex justify-end space-x-4">
-        <Button
-          onClick={handleSessionToggle}
-          size="lg"
-          variant={isActive ? 'destructive' : 'default'}
-          className="shadow-glow hover:shadow-glow-md"
-          disabled={isInitializing}
+    <div
+      className={cn(
+        'fixed bottom-0 left-0 flex w-full items-center justify-center p-4',
+        'bg-gradient-to-t from-card via-card/90 to-card/0'
+      )}
+    >
+      <AnimatePresence>
+        <motion.div
+          initial={{ y: '100%', opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: '100%', opacity: 0 }}
+          className="flex items-center gap-4 rounded-lg border border-border bg-card p-4 shadow-sm"
         >
-          {isInitializing ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Initializing...
-            </>
-          ) : isActive ? (
-            <>
-              <Square className="mr-2 h-4 w-4" />
-              End Session
-            </>
-          ) : (
-            <>
-              <Video className="mr-2 h-4 w-4" />
-              Start Session
-            </>
-          )}
-        </Button>
-      </div>
+          <Toggle pressed={!isMuted} onPressedChange={handleMuteToggle}>
+            {isMuted ? (
+              <MicOff className="size-4" />
+            ) : (
+              <Mic className="size-4" />
+            )}
+          </Toggle>
+
+          <div className="relative grid h-8 w-48 shrink grow-0">
+            <MicFFT fft={micFft} className="fill-current" />
+          </div>
+
+          <Button
+            className="flex items-center gap-1"
+            onClick={handleDisconnect}
+            variant="destructive"
+          >
+            <Phone className="size-4 opacity-50" strokeWidth={2} />
+            <span>End Call</span>
+          </Button>
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }
