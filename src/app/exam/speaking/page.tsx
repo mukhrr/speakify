@@ -6,7 +6,6 @@ import { fetchAccessToken } from 'hume';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Chat from '@/components/exam/speaking/chat';
-// import { VoiceProvider } from '@humeai/voice-react';
 // import { Timer } from '@/components/exam/speaking/timer';
 
 export default function SpeakingExamPage() {
