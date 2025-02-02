@@ -17,7 +17,15 @@
     },
     "tailwindcss": true,
     "supabase": true,
-    "humeai": true
+    "humeai": {
+      "version": "latest",
+      "features": [
+        "empathicVoice",
+        "prosody",
+        "sentiment"
+      ],
+      "integration": "@humeai/voice-react"
+    }
   },
   "format": {
     "indentSize": 2,
@@ -43,7 +51,16 @@
       "path": "src/components",
       "structure": {
         "ui": "Reusable UI components from shadcn/ui",
-        "exam": "Exam-specific components",
+        "exam": {
+          "speaking": {
+            "chat": "Speaking exam chat interface",
+            "controls": "Audio recording and playback controls",
+            "messages": "Question and response messages",
+            "start-call": "Initial exam setup and configuration",
+            "speaking-parts": "Different parts of the speaking exam"
+          },
+          "shared": "Shared exam components"
+        },
         "layout": "Layout components",
         "shared": "Shared components"
       }
@@ -61,7 +78,10 @@
       "structure": {
         "utils": "Utility functions",
         "supabase": "Supabase client",
-        "hume": "HUME AI integration"
+        "hume": {
+          "config": "Hume AI configuration",
+          "examiner": "AI examiner implementation"
+        }
       }
     },
     "styles": "src/styles",
@@ -93,7 +113,8 @@
       "examples": [
         "useExamState",
         "useAudioRecorder",
-        "useTimer"
+        "useTimer",
+        "useQuestionMessages"
       ]
     },
     "handlers": {
@@ -149,7 +170,19 @@
       "zod": true
     },
     "state": {
-      "reactHooks": true
+      "reactHooks": true,
+      "zustand": true
+    },
+    "ai": {
+      "humeai": {
+        "packages": [
+          "@humeai/voice-react"
+        ],
+        "features": [
+          "empathicVoice",
+          "prosody"
+        ]
+      }
     },
     "icons": {
       "lucide": true

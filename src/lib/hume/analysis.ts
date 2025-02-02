@@ -1,65 +1,93 @@
-import { fetchAccessToken } from 'hume';
+export interface SpeakingScores {
+  fluency: number;
+  pronunciation: number;
+  grammar: number;
+  vocabulary: number;
+  overall: number;
+}
 
 export interface SpeakingResult {
   partNumber: number;
-  scores: {
-    fluency: number;
-    pronunciation: number;
-    grammar: number;
-    vocabulary: number;
-    overall: number;
-  };
+  scores: SpeakingScores;
   feedback: string[];
+  summary: string;
+  timestamp: string;
+  audioUrl?: string;
 }
 
-export async function analyzeSpeakingTest(
-  recordings: { partNumber: number; audioUrl: string }[]
-): Promise<SpeakingResult[]> {
-  try {
-    // Get Hume AI access token
-    const token = await fetchAccessToken({
-      apiKey: process.env.NEXT_PUBLIC_HUME_API_KEY!,
-      secretKey: process.env.NEXT_PUBLIC_HUME_SECRET_KEY!,
-    });
-
-    // TODO: Implement actual Hume AI analysis
-    // For now returning mock data
-    const mockResults: SpeakingResult[] = recordings.map((recording) => ({
-      partNumber: recording.partNumber,
-      scores: {
-        fluency: 7.0 + Math.random(),
-        pronunciation: 7.0 + Math.random(),
-        grammar: 7.0 + Math.random(),
-        vocabulary: 7.0 + Math.random(),
-        overall: 7.0 + Math.random(),
-      },
-      feedback: [
-        'Good use of natural expressions',
-        'Clear pronunciation with occasional errors',
-        'Well-structured responses',
-      ],
-    }));
-
-    return mockResults;
-  } catch (error) {
-    console.error('Error analyzing speaking test:', error);
-    throw error;
-  }
+export interface SpeakingTestResult {
+  userId: string;
+  testId: string;
+  results: SpeakingResult[];
+  overallBandScore: number;
+  createdAt: string;
 }
 
-// Helper function to calculate band scores based on raw scores
-export function calculateBandScore(score: number): number {
-  // IELTS band score conversion (simplified)
-  if (score >= 8.5) return 9;
+// Calculate band score based on overall score
+export const calculateBandScore = (score: number): number => {
+  if (score >= 9) return 9;
+  if (score >= 8) return 8.5;
   if (score >= 7.5) return 8;
+  if (score >= 7) return 7.5;
   if (score >= 6.5) return 7;
+  if (score >= 6) return 6.5;
   if (score >= 5.5) return 6;
+  if (score >= 5) return 5.5;
   if (score >= 4.5) return 5;
-  if (score >= 3.5) return 4;
-  if (score >= 2.5) return 3;
-  if (score >= 1.5) return 2;
-  return 1;
-}
+  return 4;
+};
+
+// Store part result in session storage
+export const storeSpeakingPartResult = (result: SpeakingResult) => {
+  const key = `speaking-part-${result.partNumber}`;
+  sessionStorage.setItem(key, JSON.stringify(result));
+};
+
+// Get all stored part results
+export const getAllSpeakingResults = (): SpeakingResult[] => {
+  const results: SpeakingResult[] = [];
+  for (let i = 1; i <= 3; i++) {
+    const key = `speaking-part-${i}`;
+    const stored = sessionStorage.getItem(key);
+    if (stored) {
+      results.push(JSON.parse(stored));
+    }
+  }
+  return results;
+};
+
+// Clear all stored results
+export const clearSpeakingResults = () => {
+  for (let i = 1; i <= 3; i++) {
+    sessionStorage.removeItem(`speaking-part-${i}`);
+  }
+};
+
+// Analyze speaking test recordings and generate results
+export const analyzeSpeakingTest = async (
+  recordings: { partNumber: number; audioUrl: string }[]
+): Promise<SpeakingResult[]> => {
+  // TODO: Implement actual Hume AI analysis
+  // This is a mock implementation for now
+  return recordings.map((recording) => ({
+    partNumber: recording.partNumber,
+    scores: {
+      fluency: Math.random() * 2 + 7,
+      pronunciation: Math.random() * 2 + 7,
+      grammar: Math.random() * 2 + 7,
+      vocabulary: Math.random() * 2 + 7,
+      overall: Math.random() * 2 + 7,
+    },
+    feedback: [
+      'Good use of complex vocabulary',
+      'Clear pronunciation with minor errors',
+      'Maintained good fluency throughout',
+    ],
+    summary: 'Overall strong performance with good control of language',
+    timestamp: new Date().toISOString(),
+    audioUrl: recording.audioUrl,
+  }));
+};
 
 // Generate feedback based on scores and analysis
 export function generateFeedback(scores: SpeakingResult['scores']): string[] {

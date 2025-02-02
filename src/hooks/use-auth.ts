@@ -1,5 +1,5 @@
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
+import { supabase } from '@/lib/supabase/client';
 import { useCallback, useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 
@@ -7,7 +7,6 @@ export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const supabase = createClient();
 
   useEffect(() => {
     const {

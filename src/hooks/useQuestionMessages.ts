@@ -7,7 +7,6 @@ export const useQuestionMessages = (partNumber: 1 | 2 | 3) => {
     if (msg.type !== 'assistant_message' || !msg.message?.content) return false;
 
     const content = msg.message.content.toLowerCase();
-    // Filter for actual questions and important prompts
     return (
       content.includes('?') ||
       (partNumber === 2 && content.includes("let's start")) ||
@@ -23,7 +22,6 @@ export const useQuestionMessages = (partNumber: 1 | 2 | 3) => {
       content.includes('where') ||
       content.includes('which') ||
       content.includes('do you') ||
-      content.includes('?') ||
       content.includes('describe')
     );
   });
