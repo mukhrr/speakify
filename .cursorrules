@@ -5,9 +5,14 @@
   "core": {
     "typescript": true,
     "nextjs": {
-      "version": "14.1",
+      "version": "15.1",
       "appDir": true,
-      "strictMode": true
+      "strictMode": true,
+      "turbo": true
+    },
+    "react": {
+      "version": "19.0",
+      "strict": true
     },
     "tailwindcss": true,
     "supabase": true,
@@ -22,8 +27,10 @@
     "arrowParens": "always"
   },
   "linting": {
-    "eslint": true,
-    "strict": true,
+    "eslint": {
+      "version": "9.0",
+      "strict": true
+    },
     "rules": {
       "noUnusedVars": "warn",
       "noExplicitAny": "warn",
@@ -34,7 +41,7 @@
     "components": {
       "path": "src/components",
       "structure": {
-        "ui": "Reusable UI components",
+        "ui": "Reusable UI components from shadcn/ui",
         "exam": "Exam-specific components",
         "layout": "Layout components",
         "shared": "Shared components"
@@ -127,6 +134,24 @@
       "interface": "after-imports",
       "component": "after-interface",
       "styles": "bottom"
+    }
+  },
+  "dependencies": {
+    "ui": {
+      "shadcn": true,
+      "radix": true,
+      "tailwind": true,
+      "framerMotion": true
+    },
+    "forms": {
+      "reactHookForm": true,
+      "zod": true
+    },
+    "state": {
+      "reactHooks": true
+    },
+    "icons": {
+      "lucide": true
     }
   }
 }

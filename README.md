@@ -10,21 +10,28 @@ A modern IELTS exam simulation platform built with Next.js, TypeScript, and AI-p
 - 📊 Detailed performance analytics
 - 💾 Secure data storage with Supabase
 - 🎨 Modern UI with Tailwind CSS and shadcn/ui
+- 🌙 Dark mode support with next-themes
+- 🚀 Turbo Dev Server for faster development
 
 ## Tech Stack
 
-- **Frontend**: Next.js 14, TypeScript, Tailwind CSS
-- **UI Components**: shadcn/ui
+- **Framework**: Next.js 15.1, React 19, TypeScript
+- **UI Components**: shadcn/ui, Radix UI
+- **Styling**: Tailwind CSS, CSS Modules
 - **Backend**: Supabase
 - **AI Integration**: HUME AI
 - **Authentication**: Supabase Auth
 - **Database**: PostgreSQL (via Supabase)
+- **State Management**: React Hooks
+- **Form Handling**: React Hook Form, Zod
+- **Icons**: Lucide React
 
 ## Prerequisites
 
 - Node.js 18.17 or later
 - Supabase account
 - HUME AI API key
+- Git for version control
 
 ## Getting Started
 
@@ -38,8 +45,6 @@ A modern IELTS exam simulation platform built with Next.js, TypeScript, and AI-p
 2. Install dependencies:
 
    ```bash
-   npm install
-   # or
    yarn install
    ```
 
@@ -54,8 +59,6 @@ A modern IELTS exam simulation platform built with Next.js, TypeScript, and AI-p
 4. Run the development server:
 
    ```bash
-   npm run dev
-   # or
    yarn dev
    ```
 
@@ -65,15 +68,36 @@ A modern IELTS exam simulation platform built with Next.js, TypeScript, and AI-p
 
 ```
 src/
-├── app/                 # Next.js app router pages
-├── components/         # Reusable UI components
-├── hooks/             # Custom React hooks
-├── lib/               # Utility libraries and configurations
-├── services/          # External service integrations
-├── styles/            # Global styles and Tailwind CSS
-├── types/             # TypeScript type definitions
-└── utils/             # Helper functions and utilities
+├── app/                # Next.js app router pages
+│   ├── exam/          # Exam module pages
+│   ├── auth/          # Authentication pages
+│   └── dashboard/     # User dashboard
+├── components/        # Reusable UI components
+│   ├── ui/           # Base UI components
+│   ├── exam/         # Exam-specific components
+│   ├── layout/       # Layout components
+│   └── shared/       # Shared components
+├── hooks/            # Custom React hooks
+├── lib/              # Utility libraries
+│   ├── utils/        # Utility functions
+│   ├── supabase/     # Supabase client
+│   └── hume/         # HUME AI integration
+├── styles/           # Global styles
+├── types/            # TypeScript types
+└── utils/            # Helper functions
 ```
+
+## Development Tools
+
+- **Formatting**: Prettier
+- **Linting**: ESLint with TypeScript and React rules
+- **Type Checking**: TypeScript
+- **Git Hooks**: Husky (optional)
+- **VS Code Extensions**:
+  - ESLint
+  - Prettier
+  - Tailwind CSS IntelliSense
+  - TypeScript and JavaScript Language Features
 
 ## Contributing
 
@@ -93,3 +117,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [Supabase](https://supabase.io/)
 - [HUME AI](https://hume.ai/)
 - [shadcn/ui](https://ui.shadcn.com/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Radix UI](https://www.radix-ui.com/)
