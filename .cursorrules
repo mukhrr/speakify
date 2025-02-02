@@ -3,6 +3,7 @@
   "description": "AI-powered IELTS exam simulation platform",
   "version": "1.0.0",
   "core": {
+    "packageManager": "yarn",
     "typescript": true,
     "nextjs": {
       "version": "15.1",
