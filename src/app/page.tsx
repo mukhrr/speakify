@@ -25,7 +25,8 @@ export default function Home() {
     },
     {
       title: 'Listening',
-      description: 'Enhance your listening skills with various audio materials.',
+      description:
+        'Enhance your listening skills with various audio materials.',
       href: '/exam/listening',
       icon: '🎧',
     },

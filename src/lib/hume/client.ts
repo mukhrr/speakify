@@ -40,4 +40,4 @@ export const createHumeClient = () => {
   }
 
   return new HumeClient({ apiKey: HUME_API_KEY });
-}; 
+};

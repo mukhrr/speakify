@@ -1,29 +1,132 @@
 {
+  "name": "Speakify IELTS Simulator",
+  "description": "AI-powered IELTS exam simulation platform",
+  "version": "1.0.0",
+  "core": {
     "typescript": true,
-    "tailwindcss": true,
-    "format": {
-        "indentSize": 2,
-        "singleQuote": true,
-        "semi": true,
-        "trailingComma": "es5"
-    },
-    "linting": {
-        "eslint": true,
-        "strict": true
-    },
     "nextjs": {
-        "appDir": true,
-        "strictMode": true
+      "version": "14.1",
+      "appDir": true,
+      "strictMode": true
     },
-    "folders": {
-        "components": "src/components",
-        "pages": "src/app",
-        "styles": "src/styles",
-        "utils": "src/utils",
-        "types": "src/types",
-        "lib": "src/lib",
-        "hooks": "src/hooks",
-        "constants": "src/constants",
-        "services": "src/services"
+    "tailwindcss": true,
+    "supabase": true,
+    "humeai": true
+  },
+  "format": {
+    "indentSize": 2,
+    "singleQuote": true,
+    "semi": true,
+    "trailingComma": "es5",
+    "printWidth": 80,
+    "arrowParens": "always"
+  },
+  "linting": {
+    "eslint": true,
+    "strict": true,
+    "rules": {
+      "noUnusedVars": "warn",
+      "noExplicitAny": "warn",
+      "noConsole": "warn"
     }
+  },
+  "folders": {
+    "components": {
+      "path": "src/components",
+      "structure": {
+        "ui": "Reusable UI components",
+        "exam": "Exam-specific components",
+        "layout": "Layout components",
+        "shared": "Shared components"
+      }
+    },
+    "pages": {
+      "path": "src/app",
+      "structure": {
+        "exam": "Exam module pages",
+        "auth": "Authentication pages",
+        "dashboard": "User dashboard"
+      }
+    },
+    "lib": {
+      "path": "src/lib",
+      "structure": {
+        "utils": "Utility functions",
+        "supabase": "Supabase client",
+        "hume": "HUME AI integration"
+      }
+    },
+    "styles": "src/styles",
+    "utils": "src/utils",
+    "types": "src/types",
+    "hooks": "src/hooks",
+    "constants": "src/constants",
+    "services": "src/services"
+  },
+  "naming": {
+    "components": {
+      "style": "PascalCase",
+      "examples": [
+        "ExamCard",
+        "SpeakingTest",
+        "ReadingSection"
+      ]
+    },
+    "utils": {
+      "style": "camelCase",
+      "examples": [
+        "formatTime",
+        "calculateScore",
+        "validateAnswer"
+      ]
+    },
+    "hooks": {
+      "style": "useNounVerb",
+      "examples": [
+        "useExamState",
+        "useAudioRecorder",
+        "useTimer"
+      ]
+    },
+    "handlers": {
+      "style": "handleEvent",
+      "examples": [
+        "handleSubmit",
+        "handleRecordStart",
+        "handleAnswerSelect"
+      ]
+    }
+  },
+  "imports": {
+    "style": "aliases",
+    "baseUrl": "src",
+    "paths": {
+      "@/*": [
+        "*"
+      ],
+      "@/components/*": [
+        "components/*"
+      ],
+      "@/lib/*": [
+        "lib/*"
+      ],
+      "@/hooks/*": [
+        "hooks/*"
+      ],
+      "@/utils/*": [
+        "utils/*"
+      ]
+    }
+  },
+  "components": {
+    "style": "functional",
+    "propsInterface": true,
+    "defaultExport": false,
+    "structure": {
+      "imports": "top",
+      "interface": "after-imports",
+      "component": "after-interface",
+      "styles": "bottom"
+    }
+  }
 }

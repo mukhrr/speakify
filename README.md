@@ -29,12 +29,14 @@ A modern IELTS exam simulation platform built with Next.js, TypeScript, and AI-p
 ## Getting Started
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/yourusername/speakify.git
    cd speakify
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    # or
@@ -42,12 +44,15 @@ A modern IELTS exam simulation platform built with Next.js, TypeScript, and AI-p
    ```
 
 3. Set up environment variables:
+
    ```bash
    cp .env.example .env.local
    ```
+
    Fill in your Supabase and HUME AI credentials.
 
 4. Run the development server:
+
    ```bash
    npm run dev
    # or
@@ -87,4 +92,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [Next.js](https://nextjs.org/)
 - [Supabase](https://supabase.io/)
 - [HUME AI](https://hume.ai/)
-- [shadcn/ui](https://ui.shadcn.com/) 
+- [shadcn/ui](https://ui.shadcn.com/)
