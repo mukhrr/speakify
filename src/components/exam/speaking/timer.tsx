@@ -4,9 +4,11 @@ import { useEffect, useState } from 'react';
 
 interface TimerProps {
   isRunning: boolean;
+  maxTime?: number;
+  onTimeUp?: () => void;
 }
 
-export function Timer({ isRunning }: TimerProps) {
+export function Timer({ isRunning, maxTime, onTimeUp }: TimerProps) {
   const [time, setTime] = useState(0);
 
   useEffect(() => {
@@ -14,7 +16,14 @@ export function Timer({ isRunning }: TimerProps) {
 
     if (isRunning) {
       interval = setInterval(() => {
-        setTime((prevTime) => prevTime + 1);
+        setTime((prevTime) => {
+          const newTime = prevTime + 1;
+          if (maxTime && newTime >= maxTime) {
+            onTimeUp?.();
+            return maxTime;
+          }
+          return newTime;
+        });
       }, 1000);
     }
 
@@ -23,7 +32,7 @@ export function Timer({ isRunning }: TimerProps) {
         clearInterval(interval);
       }
     };
-  }, [isRunning]);
+  }, [isRunning, maxTime, onTimeUp]);
 
   const minutes = Math.floor(time / 60);
   const seconds = time % 60;
