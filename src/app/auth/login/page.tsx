@@ -10,7 +10,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -40,6 +39,7 @@ export default function LoginPage() {
     try {
       await signIn(data.email, data.password);
     } catch (error) {
+      console.error(error);
       setError('Invalid email or password');
     }
   };
@@ -61,9 +61,12 @@ export default function LoginPage() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter your email" {...field} />
+                    <Input
+                      label="Email"
+                      placeholder="Enter your email"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -75,9 +78,9 @@ export default function LoginPage() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
                   <FormControl>
                     <Input
+                      label="Password"
                       type="password"
                       placeholder="Enter your password"
                       {...field}
@@ -100,7 +103,7 @@ export default function LoginPage() {
 
         <div className="mt-4 text-center text-sm">
           <p>
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link
               href="/auth/register"
               className="text-blue-600 hover:underline"

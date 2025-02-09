@@ -10,7 +10,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -53,10 +52,11 @@ export default function RegisterPage() {
     try {
       setError('');
       await signUp(data.email, data.password);
-    } catch (error: any) {
+    } catch (error) {
       setError(
-        error.message ||
-          'An error occurred during registration. Please try again.'
+        error instanceof Error
+          ? error.message
+          : 'An error occurred during registration. Please try again.'
       );
     }
   };
@@ -78,9 +78,12 @@ export default function RegisterPage() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter your email" {...field} />
+                    <Input
+                      label="Email"
+                      placeholder="Enter your email"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -92,9 +95,9 @@ export default function RegisterPage() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
                   <FormControl>
                     <Input
+                      label="Password"
                       type="password"
                       placeholder="Create a password"
                       {...field}
@@ -110,9 +113,9 @@ export default function RegisterPage() {
               name="confirmPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Confirm Password</FormLabel>
                   <FormControl>
                     <Input
+                      label="Confirm Password"
                       type="password"
                       placeholder="Confirm your password"
                       {...field}

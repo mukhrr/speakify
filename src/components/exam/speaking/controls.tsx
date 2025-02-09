@@ -51,7 +51,7 @@ export default function Controls({
     } else if (voice.status.value === 'connected') {
       voice.unmute();
     }
-  }, [voice.isPlaying, voice.status.value, voice.mute, voice.unmute]);
+  }, [voice]);
 
   return (
     <div
