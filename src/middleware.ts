@@ -1,9 +1,10 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import type { CookieOptions } from '@supabase/ssr';
 
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({
+  const response = NextResponse.next({
     request: {
       headers: request.headers,
     },
@@ -17,10 +18,10 @@ export async function middleware(request: NextRequest) {
         get(name: string) {
           return request.cookies.get(name)?.value;
         },
-        set(name: string, value: string, options: any) {
+        set(name: string, value: string, options: CookieOptions) {
           response.cookies.set({ name, value, ...options });
         },
-        remove(name: string, options: any) {
+        remove(name: string, options: CookieOptions) {
           response.cookies.set({ name, value: '', ...options });
         },
       },
@@ -31,20 +32,19 @@ export async function middleware(request: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession();
 
-  // Protected routes
-  if (
-    request.nextUrl.pathname.startsWith('/dashboard') ||
-    request.nextUrl.pathname.startsWith('/exam')
-  ) {
-    if (!session) {
-      return NextResponse.redirect(new URL('/auth/login', request.url));
-    }
-  }
-
-  // Auth routes - redirect to dashboard if already logged in
+  // Auth routes - redirect to intended destination or dashboard if already logged in
   if (request.nextUrl.pathname.startsWith('/auth')) {
     if (session) {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
+      // Check if there's a redirect URL in the query params
+      const redirectTo = request.nextUrl.searchParams.get('redirectTo');
+      if (
+        redirectTo &&
+        (redirectTo.startsWith('/') || redirectTo.startsWith('/exam'))
+      ) {
+        return NextResponse.redirect(new URL(redirectTo, request.url));
+      }
+      // Default redirect to dashboard if no valid redirect URL
+      return NextResponse.redirect(new URL('/', request.url));
     }
   }
 

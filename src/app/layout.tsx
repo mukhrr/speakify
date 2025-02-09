@@ -6,6 +6,7 @@ import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import { MainNav } from '@/components/nav';
+import { AuthHandler } from '@/components/auth/auth-handler';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -28,6 +29,7 @@ export default function RootLayout({
           enableSystem={false}
           storageKey="speakify-theme"
         >
+          <AuthHandler />
           <MainNav />
           {children}
           <Toaster />

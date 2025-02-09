@@ -2,9 +2,11 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Moon, Sun } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { LogOut, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { supabase } from '@/lib/supabase/client';
+import { User } from '@supabase/supabase-js';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -13,10 +15,57 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 export function MainNav() {
   const pathname = usePathname();
+  const router = useRouter();
   const { setTheme } = useTheme();
+  const [user, setUser] = React.useState<User | null>(null);
+
+  React.useEffect(() => {
+    const getUser = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      setUser(session?.user ?? null);
+    };
+
+    getUser();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      // If user just logged in and is on the login page, redirect to home
+      if (session?.user && pathname?.includes('/auth/login')) {
+        router.push('/');
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [pathname, router]);
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      router.push('/auth/login');
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -25,50 +74,82 @@ export function MainNav() {
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <span className="font-bold">Speakify</span>
           </Link>
-          <nav className="flex items-center space-x-6 text-sm font-medium">
-            <Link
-              href="/exam/reading"
-              className={`transition-colors hover:text-foreground/80 ${
-                pathname?.startsWith('/exam/reading')
-                  ? 'text-foreground'
-                  : 'text-foreground/60'
-              }`}
-            >
-              Reading
-            </Link>
-            <Link
-              href="/exam/writing"
-              className={`transition-colors hover:text-foreground/80 ${
-                pathname?.startsWith('/exam/writing')
-                  ? 'text-foreground'
-                  : 'text-foreground/60'
-              }`}
-            >
-              Writing
-            </Link>
-            <Link
-              href="/exam/listening"
-              className={`transition-colors hover:text-foreground/80 ${
-                pathname?.startsWith('/exam/listening')
-                  ? 'text-foreground'
-                  : 'text-foreground/60'
-              }`}
-            >
-              Listening
-            </Link>
-            <Link
-              href="/exam/speaking"
-              className={`transition-colors hover:text-foreground/80 ${
-                pathname?.startsWith('/exam/speaking')
-                  ? 'text-foreground'
-                  : 'text-foreground/60'
-              }`}
-            >
-              Speaking
-            </Link>
-          </nav>
+          {user && (
+            <nav className="flex items-center space-x-6 text-sm font-medium">
+              <Link
+                href="/exam/reading"
+                className={`transition-colors hover:text-foreground/80 ${
+                  pathname?.startsWith('/exam/reading')
+                    ? 'text-foreground'
+                    : 'text-foreground/60'
+                }`}
+              >
+                Reading
+              </Link>
+              <Link
+                href="/exam/writing"
+                className={`transition-colors hover:text-foreground/80 ${
+                  pathname?.startsWith('/exam/writing')
+                    ? 'text-foreground'
+                    : 'text-foreground/60'
+                }`}
+              >
+                Writing
+              </Link>
+              <Link
+                href="/exam/listening"
+                className={`transition-colors hover:text-foreground/80 ${
+                  pathname?.startsWith('/exam/listening')
+                    ? 'text-foreground'
+                    : 'text-foreground/60'
+                }`}
+              >
+                Listening
+              </Link>
+              <Link
+                href="/exam/speaking"
+                className={`transition-colors hover:text-foreground/80 ${
+                  pathname?.startsWith('/exam/speaking')
+                    ? 'text-foreground'
+                    : 'text-foreground/60'
+                }`}
+              >
+                Speaking
+              </Link>
+            </nav>
+          )}
         </div>
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+          {user ? (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="icon" className="mr-2">
+                  <LogOut className="size-[1.2rem]" />
+                  <span className="sr-only">Logout</span>
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    Are you sure you want to logout?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    You will need to login again to access your account.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleLogout}>
+                    Logout
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          ) : (
+            <Button variant="ghost" asChild className="mr-2">
+              <Link href="/auth/login">Login</Link>
+            </Button>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">

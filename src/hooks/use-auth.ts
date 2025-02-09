@@ -29,7 +29,7 @@ export function useAuth() {
           password,
         });
         if (error) throw error;
-        router.push('/dashboard');
+        router.push('/');
       } catch (error) {
         throw error;
       }
