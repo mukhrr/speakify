@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
-import { VoiceProvider, useVoice } from '@humeai/voice-react';
+import { VoiceProvider, JSONMessage } from '@humeai/voice-react';
 import { IELTSExaminer } from '@/lib/hume/examiner';
 import { storeSpeakingPartResult, SpeakingResult } from '@/lib/hume/analysis';
 
@@ -53,7 +53,7 @@ export default function Chat({
     return match ? parseFloat(match[1]) : null;
   };
 
-  const handlePartCompletion = async (summary: any) => {
+  const handlePartCompletion = async (summary: SpeakingResult) => {
     const result: SpeakingResult = {
       partNumber,
       scores: {
@@ -75,11 +75,11 @@ export default function Chat({
     onCompleteAction(partNumber);
   };
 
-  const handleMessage = (message: any) => {
+  const handleMessage = (message: JSONMessage) => {
     if (
       partNumber === 2 &&
       message.type === 'assistant_message' &&
-      message.message.content.includes("let's start if you are ready")
+      message.message?.content?.includes("let's start if you are ready")
     ) {
       setShouldStartTimer(true);
     }
@@ -98,9 +98,11 @@ export default function Chat({
         const scores = extractScores(message.message.content);
         if (scores) {
           handlePartCompletion({
+            partNumber,
             scores,
             feedback: extractFeedback(message.message.content),
             summary: message.message.content,
+            timestamp: new Date().toISOString(),
           });
         }
       }

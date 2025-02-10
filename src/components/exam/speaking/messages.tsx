@@ -1,20 +1,20 @@
 'use client';
 
 import { Ref } from 'react';
-import { useVoice } from '@humeai/voice-react';
+// import { useVoice } from '@humeai/voice-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { cn } from '@/utils';
 import Expressions from './expressions';
 import { useQuestionMessages } from '@/hooks/useQuestionMessages';
-
+import { AssistantMessage } from 'hume/api/resources/empathicVoice/types/AssistantMessage';
 interface MessagesProps {
   ref?: Ref<HTMLDivElement>;
   partNumber: 1 | 2 | 3;
 }
 
 const Messages = ({ ref, partNumber }: MessagesProps) => {
-  const questionMessages: any[] = useQuestionMessages(partNumber);
+  const questionMessages: AssistantMessage[] = useQuestionMessages(partNumber);
 
   return (
     <motion.div

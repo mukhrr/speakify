@@ -4,7 +4,6 @@ import { Phone } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Timer } from './timer';
 
 interface StartCallProps {
   partNumber: 1 | 2 | 3;

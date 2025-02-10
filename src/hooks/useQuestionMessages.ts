@@ -1,5 +1,5 @@
 import { useVoice } from '@humeai/voice-react';
-
+import { AssistantMessage } from 'hume/api/resources/empathicVoice/types/AssistantMessage';
 export const useQuestionMessages = (partNumber: 1 | 2 | 3) => {
   const { messages } = useVoice();
 
@@ -26,5 +26,5 @@ export const useQuestionMessages = (partNumber: 1 | 2 | 3) => {
     );
   });
 
-  return questionMessages;
+  return questionMessages as AssistantMessage[];
 };

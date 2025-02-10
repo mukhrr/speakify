@@ -67,7 +67,7 @@ export default function ResultsPage() {
         <div>
           <h1 className="text-3xl font-bold">Speaking Test Results</h1>
           <p className="mt-2 text-muted-foreground">
-            Here's your detailed performance analysis
+            Here&apos;s your detailed performance analysis
           </p>
         </div>
         <Button
