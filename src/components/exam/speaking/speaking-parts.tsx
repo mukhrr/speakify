@@ -7,7 +7,7 @@ import { Card } from '@/components/ui/card';
 import Chat from './chat';
 
 interface SpeakingPartsProps {
-  accessToken: string;
+  accessToken?: string | null;
 }
 
 type PartStatus = 'not-started' | 'in-progress' | 'completed';
@@ -115,13 +115,15 @@ export function SpeakingParts({ accessToken }: SpeakingPartsProps) {
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold">{activePart.title}</h2>
         </div>
-        <div className="flex grow flex-col">
-          <Chat
-            accessToken={accessToken}
-            partNumber={activePart.id}
-            onCompleteAction={handleCompletePart}
-          />
-        </div>
+        {accessToken && (
+          <div className="flex grow flex-col">
+            <Chat
+              accessToken={accessToken}
+              partNumber={activePart.id}
+              onCompleteAction={handleCompletePart}
+            />
+          </div>
+        )}
       </div>
     );
   }

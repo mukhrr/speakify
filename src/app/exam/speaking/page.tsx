@@ -2,20 +2,30 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase/client';
+import { fetchAccessToken } from 'hume';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { SpeakingParts } from '@/components/exam/speaking/speaking-parts';
 // import { Timer } from '@/components/exam/speaking/timer';
 
+import { supabase } from '@/lib/supabase/client';
+
 export default function SpeakingExamPage() {
+  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [initialized, setInitialized] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
+    const initializeHume = async () => {
+      const token = await fetchAccessToken({
+        apiKey: process.env.NEXT_PUBLIC_HUME_API_KEY!,
+        secretKey: process.env.NEXT_PUBLIC_HUME_SECRET_KEY!,
+      });
+      setAccessToken(token);
+    };
+
     const checkAuth = async () => {
       try {
         const {
@@ -26,9 +36,7 @@ export default function SpeakingExamPage() {
           return;
         }
 
-        // For now, we'll just mark as initialized
-        // Later we'll implement proper Hume initialization
-        setInitialized(true);
+        initializeHume();
       } catch (error) {
         console.error('Auth check failed:', error);
         setError('Authentication failed. Please try again.');
@@ -60,7 +68,7 @@ export default function SpeakingExamPage() {
     );
   }
 
-  if (!initialized) {
+  if (!accessToken) {
     return (
       <div className="container mx-auto py-8">
         <Card className="p-6">
@@ -70,6 +78,14 @@ export default function SpeakingExamPage() {
           </p>
           <Button onClick={() => router.push('/')}>Return to Home</Button>
         </Card>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p>Loading exam environment...</p>
       </div>
     );
   }
@@ -84,7 +100,7 @@ export default function SpeakingExamPage() {
         </p>
       </div>
 
-      <SpeakingParts accessToken="temporary-token" />
+      <SpeakingParts accessToken={accessToken} />
     </div>
   );
 }
