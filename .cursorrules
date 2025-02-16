@@ -1,191 +1,178 @@
-{
-  "name": "Speakify IELTS Simulator",
-  "description": "AI-powered IELTS exam simulation platform",
-  "version": "1.0.0",
-  "core": {
-    "packageManager": "npm",
-    "typescript": true,
-    "nextjs": {
-      "version": "15.1",
-      "appDir": true,
-      "strictMode": true,
-      "turbo": true
-    },
-    "react": {
-      "version": "19.0",
-      "strict": true
-    },
-    "tailwindcss": true,
-    "supabase": true,
-    "humeai": {
-      "version": "latest",
-      "features": [
-        "empathicVoice",
-        "prosody",
-        "sentiment"
-      ],
-      "integration": "@humeai/voice-react"
-    }
-  },
-  "format": {
-    "indentSize": 2,
-    "singleQuote": true,
-    "semi": true,
-    "trailingComma": "es5",
-    "printWidth": 80,
-    "arrowParens": "always"
-  },
-  "linting": {
-    "eslint": {
-      "version": "9.0",
-      "strict": true
-    },
-    "rules": {
-      "noUnusedVars": "warn",
-      "noExplicitAny": "warn",
-      "noConsole": "warn"
-    }
-  },
-  "folders": {
-    "components": {
-      "path": "src/components",
-      "structure": {
-        "ui": "Reusable UI components from shadcn/ui",
-        "exam": {
-          "speaking": {
-            "chat": "Speaking exam chat interface",
-            "controls": "Audio recording and playback controls",
-            "messages": "Question and response messages",
-            "start-call": "Initial exam setup and configuration",
-            "speaking-parts": "Different parts of the speaking exam"
-          },
-          "shared": "Shared exam components"
-        },
-        "layout": "Layout components",
-        "shared": "Shared components"
-      }
-    },
-    "pages": {
-      "path": "src/app",
-      "structure": {
-        "exam": "Exam module pages",
-        "auth": "Authentication pages",
-        "dashboard": "User dashboard"
-      }
-    },
-    "lib": {
-      "path": "src/lib",
-      "structure": {
-        "utils": "Utility functions",
-        "supabase": "Supabase client",
-        "hume": {
-          "config": "Hume AI configuration",
-          "examiner": "AI examiner implementation"
-        }
-      }
-    },
-    "styles": "src/styles",
-    "utils": "src/utils",
-    "types": "src/types",
-    "hooks": "src/hooks",
-    "constants": "src/constants",
-    "services": "src/services"
-  },
-  "naming": {
-    "components": {
-      "style": "PascalCase",
-      "examples": [
-        "ExamCard",
-        "SpeakingTest",
-        "ReadingSection"
-      ]
-    },
-    "utils": {
-      "style": "camelCase",
-      "examples": [
-        "formatTime",
-        "calculateScore",
-        "validateAnswer"
-      ]
-    },
-    "hooks": {
-      "style": "useNounVerb",
-      "examples": [
-        "useExamState",
-        "useAudioRecorder",
-        "useTimer",
-        "useQuestionMessages"
-      ]
-    },
-    "handlers": {
-      "style": "handleEvent",
-      "examples": [
-        "handleSubmit",
-        "handleRecordStart",
-        "handleAnswerSelect"
-      ]
-    }
-  },
-  "imports": {
-    "style": "aliases",
-    "baseUrl": "src",
-    "paths": {
-      "@/*": [
-        "*"
-      ],
-      "@/components/*": [
-        "components/*"
-      ],
-      "@/lib/*": [
-        "lib/*"
-      ],
-      "@/hooks/*": [
-        "hooks/*"
-      ],
-      "@/utils/*": [
-        "utils/*"
-      ]
-    }
-  },
-  "components": {
-    "style": "functional",
-    "propsInterface": true,
-    "defaultExport": false,
-    "structure": {
-      "imports": "top",
-      "interface": "after-imports",
-      "component": "after-interface",
-      "styles": "bottom"
-    }
-  },
-  "dependencies": {
-    "ui": {
-      "shadcn": true,
-      "radix": true,
-      "tailwind": true,
-      "framerMotion": true
-    },
-    "forms": {
-      "reactHookForm": true,
-      "zod": true
-    },
-    "state": {
-      "reactHooks": true,
-      "zustand": true
-    },
-    "ai": {
-      "humeai": {
-        "packages": [
-          "@humeai/voice-react"
-        ],
-        "features": [
-          "empathicVoice",
-          "prosody"
-        ]
-      }
-    },
-    "icons": {
-      "lucide": true
-    }
-  }
-}
+# IELTS speaking exam simulator
+
+# Goal of the project
+
+- To create a platform for users to practice IELTS speaking exams where they can get instant feedback on their performance. Users should feel real online speaking exam experience.
+
+## Tech Stack
+
+⚛️ **Core**
+
+- Next.js 15 (App Router)
+- React 19
+- TypeScript 5.4.5
+- Supabase
+- Hume AI
+
+🎨 **UI & Styling**
+
+- Tailwind CSS 3
+- @radix-ui/react
+- @shadcn/ui
+- classnames
+- zod
+- framer-motion
+
+🛠️ **Development**
+
+- ESLint
+- Prettier
+
+## Naming Conventions
+
+📁 **Files & Directories**
+
+- Components: PascalCase (`Button.tsx`, `UserProfile.tsx`)
+- Utilities: camelCase (`formatDate.ts`, `useAuth.ts`)
+- Tests: ComponentName.test.tsx (`Button.test.tsx`)
+
+🏷️ **TypeScript**
+
+- Interfaces: IComponentName (`IButtonProps`, `IUserData`)
+- Types: TComponentName (`TButtonVariant`, `TTheme`)
+- Enums: PascalCase (`ButtonState`, `UserRole`)
+- Generic Types: TPrefixedName<T> (`TResponse<Data>`)
+
+📝 **Variables & Functions**
+
+- React Components: PascalCase (`export function Button()`)
+- Custom Hooks: useNoun (`useAuth`, `useForm`)
+- Event Handlers: handleEvent (`handleClick`, `handleSubmit`)
+- Boolean Variables: isState (`isLoading`, `hasError`)
+- Context: NounContext (`ThemeContext`, `AuthContext`)
+
+## Syntax and Formatting
+
+⌨️ **Code Style**
+
+- Use "function" over arrow functions for components
+- Keep components pure and focused
+- Prefer early returns over nested conditions
+- Use template literals for string interpolation
+
+🔍 **TypeScript**
+
+- Write explicit return types for functions
+- Use type inference for simple variables
+- Prefer union types over enums
+- Keep generics simple and descriptive
+
+🎨 **JSX & Components**
+
+- Destructure props in function parameters
+- Keep JSX clean with helper functions
+- Extract complex logic to custom hooks
+
+## Git Usage
+
+🔄 **Commit Types**
+
+- `fix:` bug fixes
+- `feat:` new features
+- `perf:` performance improvements
+- `docs:` documentation changes
+- `style:` formatting changes
+- `refactor:` code refactoring
+- `test:` adding/updating tests
+- `chore:` maintenance tasks
+
+📝 **Message Format**
+
+```text
+type(scope): concise, short and descriptive message
+```
+
+✅ **Best Practices**
+
+- Use lowercase for messages
+- Add details for complex changes
+- Reference issues: #123
+
+## Quick Reference
+
+🏗️ **Project Structure**
+
+```
+src/
+├── app/                   # Pages and route components
+│   └── auth/
+│       └── login/         # Direct pages
+├── components/            # Shared components
+├── hooks/                 # React hooks
+├── mocks/                 # Test data
+├── services/              # API integrations
+├── styles/                # Global styles
+└── utils/                 # Helpers
+```
+
+📦 **Imports**
+
+```typescript
+// ✅ Use aliases
+import { Button } from "@/components/ui/Button";
+// ❌ No relative paths
+import { Button } from "../../components/ui/Button";
+```
+
+🎨 **Styling**
+
+```typescript
+// ✅ Use theme tokens
+className = "text-theme-font-primary bg-theme-bg-primary";
+// ❌ No hard-coded values
+className = "text-[#4F4E55] bg-[#FFFFFF]";
+
+// ✅ Group classes with classnames
+import cn from "classnames";
+const classes = cn(
+  "flex items-center", // layout
+  "font-body text-base", // typography
+  "bg-theme-btn-primary" // theme
+);
+```
+
+## Key Rules
+
+### Components
+
+- Place route-specific components in `(components)/`
+- Use `@radix-ui/react` for UI components
+- Use `@shadcn/ui` to create UI components
+- Keep components small and focused
+
+### Styling
+
+- Use theme tokens from `tailwind.config.js`
+- Group classes by: layout → typography → theme → state
+- Use JIT features for custom values: `mt-[117px]`
+
+### Quality
+
+- Run ESLint before commits
+- Follow Next.js best practices
+- Write tests for shared components
+
+### Commit Messages
+
+- Use `fix:` for bug fixes
+- Use `feat:` for new features
+- Use `perf:` for performance improvements
+- Use `docs:` for documentation changes
+- Use `style:` for formatting changes
+- Use `refactor:` for code refactoring
+- Use `test:` for adding/updating tests
+- Use `chore:` for maintenance tasks
+
+# Hume AI
+
+- Use Hume AI to generate realistic speaking exam feedback

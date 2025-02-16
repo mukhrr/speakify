@@ -33,5 +33,5 @@
   "[jsonc]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "cSpell.words": ["humeai", "shadcn", "SUPABASE"]
+  "cSpell.words": ["humeai", "IELTS", "shadcn", "SUPABASE"]
 }
