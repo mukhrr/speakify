@@ -63,11 +63,26 @@ export function useAuth() {
     }
   }, [router]);
 
+  const signInWithGoogle = useCallback(async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (error) throw error;
+    } catch (error) {
+      throw error;
+    }
+  }, []);
+
   return {
     user,
     loading,
     signIn,
     signUp,
     signOut,
+    signInWithGoogle,
   };
 }

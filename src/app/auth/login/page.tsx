@@ -1,9 +1,12 @@
 'use client';
 
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useAuth } from '@/hooks/use-auth';
+import { Chrome, Loader2 } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -13,8 +16,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import Link from 'next/link';
-import { useState } from 'react';
+import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/hooks/use-auth';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -24,8 +27,9 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const { signIn } = useAuth();
+  const { signIn, signInWithGoogle } = useAuth();
   const [error, setError] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -41,6 +45,18 @@ export default function LoginPage() {
     } catch (error) {
       console.error(error);
       setError('Invalid email or password');
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setIsLoading(true);
+      await signInWithGoogle();
+    } catch (error) {
+      console.error(error);
+      setError('Failed to sign in with Google');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -100,6 +116,32 @@ export default function LoginPage() {
             </Button>
           </form>
         </Form>
+
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <Separator className="w-full" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-background px-2 text-muted-foreground">
+              Or continue with
+            </span>
+          </div>
+        </div>
+
+        <Button
+          variant="outline"
+          type="button"
+          disabled={isLoading}
+          onClick={handleGoogleSignIn}
+          className="w-full"
+        >
+          {isLoading ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Chrome className="mr-2 h-4 w-4" />
+          )}
+          Continue with Google
+        </Button>
 
         <div className="mt-4 text-center text-sm">
           <p>
