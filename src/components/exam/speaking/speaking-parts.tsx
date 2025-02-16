@@ -1,13 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ChartBar } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Chat from './chat';
+import { useExamResults } from '@/hooks/useExamResults';
 
 interface SpeakingPartsProps {
   accessToken?: string | null;
+  partId?: string;
 }
 
 type PartStatus = 'not-started' | 'in-progress' | 'completed';
@@ -17,102 +19,84 @@ interface Part {
   title: string;
   description: string;
   duration: string;
-  status: PartStatus;
 }
 
-const STORAGE_KEY = 'speaking-parts-status';
+const PARTS: Part[] = [
+  {
+    id: 1,
+    title: 'Part 1: Introduction and Interview',
+    description: 'General questions about yourself and familiar topics',
+    duration: '4-5 minutes',
+  },
+  {
+    id: 2,
+    title: 'Part 2: Individual Long Turn',
+    description: 'Speak about a particular topic using a task card',
+    duration: '3-4 minutes',
+  },
+  {
+    id: 3,
+    title: 'Part 3: Two-Way Discussion',
+    description: 'Further questions connected to the topic in Part 2',
+    duration: '4-5 minutes',
+  },
+];
 
-export function SpeakingParts({ accessToken }: SpeakingPartsProps) {
+export function SpeakingParts({ accessToken, partId }: SpeakingPartsProps) {
   const router = useRouter();
-  const [parts, setParts] = useState<Part[]>(() => {
-    // Try to load saved state from localStorage
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        return JSON.parse(saved);
+  const testId = sessionStorage.getItem('current-test-id');
+  const { currentTest, isLoading } = useExamResults();
+  const [activePart, setActivePart] = useState<Part | null>(() => {
+    if (partId) {
+      const part = PARTS.find((p) => p.id === Number(partId));
+      if (part) {
+        return part;
       }
     }
-
-    // Default state if nothing is saved
-    return [
-      {
-        id: 1,
-        title: 'Part 1: Introduction and Interview',
-        description: 'General questions about yourself and familiar topics',
-        duration: '4-5 minutes',
-        status: 'not-started',
-      },
-      {
-        id: 2,
-        title: 'Part 2: Individual Long Turn',
-        description: 'Speak about a particular topic using a task card',
-        duration: '3-4 minutes',
-        status: 'not-started',
-      },
-      {
-        id: 3,
-        title: 'Part 3: Two-Way Discussion',
-        description: 'Further questions connected to the topic in Part 2',
-        duration: '4-5 minutes',
-        status: 'not-started',
-      },
-    ];
+    return null;
   });
 
-  const [activePart, setActivePart] = useState<Part | null>(null);
-
-  // Save to localStorage whenever parts state changes
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(parts));
-  }, [parts]);
-
   const handleStartPart = (part: Part) => {
-    setParts(
-      parts.map((p) =>
-        p.id === part.id ? { ...p, status: 'in-progress' as PartStatus } : p
-      )
-    );
     setActivePart(part);
   };
 
   const handleCompletePart = (partId: number) => {
-    setParts(
-      parts.map((p) =>
-        p.id === partId ? { ...p, status: 'completed' as PartStatus } : p
-      )
-    );
     setActivePart(null);
     if (partId === 3) {
-      router.push('/exam/speaking/results');
+      router.push('/dashboard/history');
     } else {
-      router.push('/exam/speaking');
+      router.push(`/exam/speaking/${testId}`);
     }
   };
 
-  // Handle completion from Controls component
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const savedPartsStr = localStorage.getItem(STORAGE_KEY);
-      if (savedPartsStr) {
-        const savedParts = JSON.parse(savedPartsStr);
-        setParts(savedParts);
-        setActivePart(null);
-      }
-    };
+  if (isLoading) {
+    return null;
+  }
 
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+  const getPartStatus = (partId: number): PartStatus => {
+    if (!currentTest) return 'not-started';
 
-  const allPartsCompleted = parts.every((part) => part.status === 'completed');
-  const hasInProgressPart = parts.some((part) => part.status === 'in-progress');
-
-  // Check if previous parts are completed
-  const isPreviousPartsCompleted = (partId: number) => {
-    return parts
-      .filter((p) => p.id < partId)
-      .every((p) => p.status === 'completed');
+    switch (partId) {
+      case 1:
+        return currentTest.part1 ? 'completed' : 'not-started';
+      case 2:
+        return currentTest.part2 ? 'completed' : 'not-started';
+      case 3:
+        return currentTest.part3 ? 'completed' : 'not-started';
+      default:
+        return 'not-started';
+    }
   };
+
+  const isPreviousPartsCompleted = (partId: number) => {
+    return PARTS.filter((p) => p.id < partId).every(
+      (p) => getPartStatus(p.id) === 'completed'
+    );
+  };
+
+  const allPartsCompleted = PARTS.every(
+    (part) => getPartStatus(part.id) === 'completed'
+  );
 
   if (activePart) {
     return (
@@ -136,44 +120,42 @@ export function SpeakingParts({ accessToken }: SpeakingPartsProps) {
   return (
     <div className="space-y-6">
       <div className="space-y-4">
-        {parts.map((part) => (
-          <Card key={part.id} className="p-6">
-            <div className="flex items-start justify-between">
-              <div className="space-y-2">
-                <h3 className="text-xl font-semibold">{part.title}</h3>
-                <p className="text-gray-600">{part.description}</p>
-                <p className="text-sm text-gray-500">
-                  Duration: {part.duration}
-                </p>
-                {part.status === 'not-started' &&
-                  !isPreviousPartsCompleted(part.id) && (
-                    <p className="text-sm text-muted-foreground">
-                      Complete previous {part.id === 3 ? 'parts' : 'part'} to
-                      unlock
-                    </p>
-                  )}
-              </div>
-              <Button
-                onClick={() => handleStartPart(part)}
-                disabled={
-                  (part.status === 'completed' && !allPartsCompleted) ||
-                  (hasInProgressPart && part.status !== 'in-progress') ||
-                  (!isPreviousPartsCompleted(part.id) &&
-                    part.status !== 'completed')
-                }
-                variant={part.status === 'completed' ? 'outline' : 'default'}
-              >
-                {part.status === 'completed'
-                  ? '✓ Completed'
-                  : part.status === 'in-progress'
-                    ? 'Continue Conversation'
+        {PARTS.map((part) => {
+          const status = getPartStatus(part.id);
+          return (
+            <Card key={part.id} className="p-6">
+              <div className="flex items-start justify-between">
+                <div className="space-y-2">
+                  <h3 className="text-xl font-semibold">{part.title}</h3>
+                  <p className="text-gray-600">{part.description}</p>
+                  <p className="text-sm text-gray-500">
+                    Duration: {part.duration}
+                  </p>
+                  {status === 'not-started' &&
+                    !isPreviousPartsCompleted(part.id) && (
+                      <p className="text-sm text-muted-foreground">
+                        Complete previous {part.id === 3 ? 'parts' : 'part'} to
+                        unlock
+                      </p>
+                    )}
+                </div>
+                <Button
+                  onClick={() => handleStartPart(part)}
+                  disabled={
+                    status === 'completed' || !isPreviousPartsCompleted(part.id)
+                  }
+                  variant={status === 'completed' ? 'outline' : 'default'}
+                >
+                  {status === 'completed'
+                    ? '✓ Completed'
                     : !isPreviousPartsCompleted(part.id)
                       ? 'Locked'
                       : 'Start Conversation'}
-              </Button>
-            </div>
-          </Card>
-        ))}
+                </Button>
+              </div>
+            </Card>
+          );
+        })}
       </div>
 
       {allPartsCompleted && (
@@ -181,7 +163,7 @@ export function SpeakingParts({ accessToken }: SpeakingPartsProps) {
           <Button
             size="lg"
             className="flex items-center gap-2"
-            onClick={() => router.replace('/exam/speaking/results')}
+            onClick={() => router.replace('/dashboard/history')}
           >
             <ChartBar className="size-4" />
             See Your Results

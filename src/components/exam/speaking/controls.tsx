@@ -64,6 +64,7 @@ export default function Controls({
 
       // Navigate to results page if it's the last part, otherwise go back to overview
       if (isLastPart) {
+        sessionStorage.removeItem('current-test-id');
         router.push('/exam/speaking/results');
       } else {
         router.push('/exam/speaking');

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useExamResults } from './useExamResults';
 
 interface ExamPartsStatus {
   part1Completed: boolean;
@@ -8,7 +9,8 @@ interface ExamPartsStatus {
 }
 
 export function useExamPartsStatus(): ExamPartsStatus {
-  const [status, setStatus] = useState<ExamPartsStatus>({
+  const { currentTest, isLoading } = useExamResults();
+  const [partsStatus, setPartsStatus] = useState<ExamPartsStatus>({
     part1Completed: false,
     part2Completed: false,
     part3Completed: false,
@@ -16,18 +18,15 @@ export function useExamPartsStatus(): ExamPartsStatus {
   });
 
   useEffect(() => {
-    // Check completion status for all parts
-    const part1 = sessionStorage.getItem('speaking-part-1');
-    const part2 = sessionStorage.getItem('speaking-part-2');
-    const part3 = sessionStorage.getItem('speaking-part-3');
+    if (!isLoading && currentTest) {
+      setPartsStatus({
+        part1Completed: !!currentTest.part1,
+        part2Completed: !!currentTest.part2,
+        part3Completed: !!currentTest.part3,
+        isLoading: false,
+      });
+    }
+  }, [currentTest, isLoading]);
 
-    setStatus({
-      part1Completed: !!part1,
-      part2Completed: !!part2,
-      part3Completed: !!part3,
-      isLoading: false,
-    });
-  }, []);
-
-  return status;
+  return partsStatus;
 }

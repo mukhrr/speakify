@@ -70,6 +70,17 @@ export function useExamResults(): UseExamResults {
     if (!isAuthenticated || !userId) throw new Error('User not authenticated');
 
     try {
+      // Check for existing in-progress test
+      const existingTestId = sessionStorage.getItem('current-test-id');
+      if (existingTestId) {
+        const existingTest = await getTestResult(userId, existingTestId);
+        if (existingTest && existingTest.status === 'in_progress') {
+          setCurrentTest(existingTest);
+          return existingTestId;
+        }
+      }
+
+      // If no in-progress test found, create a new one
       const testId = await createNewTest(userId);
       sessionStorage.setItem('current-test-id', testId);
 
