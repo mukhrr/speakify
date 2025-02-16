@@ -1,7 +1,6 @@
 'use client';
-import { useVoice } from '@humeai/voice-react';
-import { useEffect } from 'react';
-import { Mic, MicOff, Phone, ArrowRight } from 'lucide-react';
+
+import { Mic, MicOff, Phone, ArrowRight, Volume2, VolumeX } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 
@@ -9,6 +8,11 @@ import { Button } from '@/components/ui/button';
 import { Toggle } from '@/components/ui/toggle';
 import MicFFT from './mic-fft';
 import { cn } from '@/utils';
+import { useMicControl } from './hooks/useMicControl';
+import { useVoiceControl } from './hooks/useVoiceControl';
+import { useExamTimer } from './hooks/useExamTimer';
+import { Timer } from './timer';
+import { Loader2 } from 'lucide-react';
 
 interface ControlsProps {
   partNumber: 1 | 2 | 3;
@@ -19,9 +23,31 @@ export default function Controls({
   partNumber,
   onCompleteAction,
 }: ControlsProps) {
-  const { disconnect, status, isMuted, unmute, mute, micFft } = useVoice();
+  const {
+    status,
+    isMuted,
+    handleMuteToggle,
+    disconnect: disconnectMic,
+    micFft,
+  } = useMicControl({
+    partNumber,
+  });
+
+  const {
+    isScoring,
+    isAudioMuted,
+    handleVoiceToggle,
+    disconnect: disconnectVoice,
+  } = useVoiceControl({
+    partNumber,
+    onCompleteAction,
+  });
+
+  const { timeLeft, isPreparationTime, isRunning } = useExamTimer({
+    partNumber,
+  });
+
   const router = useRouter();
-  const voice = useVoice();
 
   const handleEndCall = () => {
     const isLastPart = partNumber === 3;
@@ -32,7 +58,8 @@ export default function Controls({
     const confirmed = window.confirm(confirmMessage);
 
     if (confirmed) {
-      disconnect();
+      disconnectMic();
+      disconnectVoice();
       onCompleteAction(partNumber);
 
       // Navigate to results page if it's the last part, otherwise go back to overview
@@ -43,15 +70,6 @@ export default function Controls({
       }
     }
   };
-
-  // Automatically mute/unmute mic based on AI speaking status
-  useEffect(() => {
-    if (voice.isPlaying) {
-      voice.mute();
-    } else if (voice.status.value === 'connected') {
-      voice.unmute();
-    }
-  }, [voice.isPlaying, voice.status.value, voice.mute, voice.unmute]);
 
   return (
     <div
@@ -79,45 +97,66 @@ export default function Controls({
               'flex items-center gap-4 rounded-lg border border-border bg-card p-4 shadow-sm'
             }
           >
-            <Toggle
-              pressed={!isMuted}
-              onPressedChange={() => {
-                if (isMuted) {
-                  unmute();
-                } else {
-                  mute();
-                }
-              }}
-            >
-              {isMuted ? (
-                <MicOff className={'size-4'} />
-              ) : (
-                <Mic className={'size-4'} />
-              )}
-            </Toggle>
-
-            <div className={'relative grid h-8 w-48 shrink grow-0'}>
-              <MicFFT fft={micFft} className={'fill-current'} />
-            </div>
-
-            <Button
-              className={'flex items-center gap-1.5'}
-              onClick={handleEndCall}
-              variant={partNumber === 3 ? 'destructive' : 'default'}
-            >
-              <span>
-                {partNumber === 3 ? (
-                  <Phone className={'size-4 opacity-50'} strokeWidth={2} />
-                ) : (
-                  <ArrowRight className={'size-4 opacity-50'} strokeWidth={2} />
+            {isScoring ? (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Calculating score...</span>
+              </div>
+            ) : (
+              <>
+                {partNumber === 2 && isRunning && (
+                  <Timer
+                    timeLeft={timeLeft}
+                    isPreparationTime={isPreparationTime}
+                  />
                 )}
-              </span>
-              <span>
-                {partNumber === 3
-                  ? 'End Speaking Test'
-                  : 'I am Done, Next Section'}
-              </span>
-            </Button>
+
+                <Toggle pressed={!isMuted} onPressedChange={handleMuteToggle}>
+                  {isMuted ? (
+                    <MicOff className={'size-4'} />
+                  ) : (
+                    <Mic className={'size-4'} />
+                  )}
+                </Toggle>
+
+                <Toggle
+                  pressed={!isAudioMuted}
+                  onPressedChange={handleVoiceToggle}
+                >
+                  {isAudioMuted ? (
+                    <VolumeX className={'size-4'} />
+                  ) : (
+                    <Volume2 className={'size-4'} />
+                  )}
+                </Toggle>
+
+                <div className={'relative grid h-8 w-48 shrink grow-0'}>
+                  <MicFFT fft={micFft} className={'fill-current'} />
+                </div>
+
+                <Button
+                  className={'flex items-center gap-1.5'}
+                  onClick={handleEndCall}
+                  variant={partNumber === 3 ? 'destructive' : 'default'}
+                >
+                  <span>
+                    {partNumber === 3 ? (
+                      <Phone className={'size-4 opacity-50'} strokeWidth={2} />
+                    ) : (
+                      <ArrowRight
+                        className={'size-4 opacity-50'}
+                        strokeWidth={2}
+                      />
+                    )}
+                  </span>
+                  <span>
+                    {partNumber === 3
+                      ? 'End Speaking Test'
+                      : 'I am Done, Next Section'}
+                  </span>
+                </Button>
+              </>
+            )}
           </motion.div>
         ) : null}
       </AnimatePresence>

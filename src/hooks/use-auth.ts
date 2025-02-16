@@ -1,25 +1,76 @@
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { useCallback, useEffect, useState } from 'react';
-import { User } from '@supabase/supabase-js';
 
-export function useAuth() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+interface UseAuthOptions {
+  redirectTo?: string;
+  onAuthStateChange?: (isAuthenticated: boolean) => void;
+  redirectIfAuthenticated?: boolean;
+}
+
+export function useAuth({
+  redirectTo = '/auth/login',
+  onAuthStateChange,
+  redirectIfAuthenticated = false,
+}: UseAuthOptions = {}) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        const authenticated = !!session;
+        setIsAuthenticated(authenticated);
+        onAuthStateChange?.(authenticated);
+
+        if (!authenticated && redirectTo) {
+          const currentPath = window.location.pathname;
+          router.push(`${redirectTo}?redirectTo=${currentPath}`);
+        }
+
+        if (authenticated && redirectIfAuthenticated) {
+          router.push('/dashboard');
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        if (redirectTo) {
+          router.push(redirectTo);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // Initial auth check
+    checkAuth();
+
+    // Listen for auth state changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
+      const authenticated = !!session;
+      setIsAuthenticated(authenticated);
+      onAuthStateChange?.(authenticated);
+
+      if (!authenticated && redirectTo) {
+        const currentPath = window.location.pathname;
+        router.push(`${redirectTo}?redirectTo=${currentPath}`);
+      }
+
+      if (authenticated && redirectIfAuthenticated) {
+        router.push('/dashboard');
+      }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [router, redirectTo, onAuthStateChange, redirectIfAuthenticated]);
 
   const signIn = useCallback(
     async (email: string, password: string) => {
@@ -29,7 +80,7 @@ export function useAuth() {
           password,
         });
         if (error) throw error;
-        router.push('/');
+        router.push('/dashboard');
       } catch (error) {
         throw error;
       }
@@ -78,8 +129,8 @@ export function useAuth() {
   }, []);
 
   return {
-    user,
-    loading,
+    isLoading,
+    isAuthenticated,
     signIn,
     signUp,
     signOut,

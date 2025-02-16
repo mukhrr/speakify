@@ -1,106 +1,144 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { fetchAccessToken } from 'hume';
+import { CheckCircle2, Lock, Loader2 } from 'lucide-react';
+import Link from 'next/link';
 
+import { useExamPartsStatus } from '@/hooks/useExamPartsStatus';
+import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { SpeakingParts } from '@/components/exam/speaking/speaking-parts';
-// import { Timer } from '@/components/exam/speaking/timer';
-
-import { supabase } from '@/lib/supabase/client';
 
 export default function SpeakingExamPage() {
-  const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  const {
+    part1Completed,
+    part2Completed,
+    part3Completed,
+    isLoading: partsLoading,
+  } = useExamPartsStatus();
+  const { isLoading: authLoading, isAuthenticated } = useAuth();
 
-  useEffect(() => {
-    const initializeHume = async () => {
-      const token = await fetchAccessToken({
-        apiKey: process.env.NEXT_PUBLIC_HUME_API_KEY!,
-        secretKey: process.env.NEXT_PUBLIC_HUME_SECRET_KEY!,
-      });
-      setAccessToken(token);
-    };
-
-    const checkAuth = async () => {
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        if (!session) {
-          router.push('/auth/login');
-          return;
-        }
-
-        initializeHume();
-      } catch (error) {
-        console.error('Auth check failed:', error);
-        setError('Authentication failed. Please try again.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkAuth();
-  }, [router]);
-
-  if (loading) {
+  if (authLoading || partsLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p>Loading exam environment...</p>
+      <div className="flex h-screen items-center justify-center">
+        <div className="flex items-center gap-2">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          <span>Loading...</span>
+        </div>
       </div>
     );
   }
 
-  if (error) {
-    return (
-      <div className="container mx-auto py-8">
-        <Card className="p-6">
-          <h2 className="mb-4 text-xl font-semibold text-red-500">Error</h2>
-          <p className="mb-4 text-gray-600">{error}</p>
-          <Button onClick={() => router.push('/')}>Return to Home</Button>
-        </Card>
-      </div>
-    );
-  }
-
-  if (!accessToken) {
-    return (
-      <div className="container mx-auto py-8">
-        <Card className="p-6">
-          <h2 className="mb-4 text-xl font-semibold">Not Ready</h2>
-          <p className="mb-4 text-gray-600">
-            The exam environment is not properly initialized. Please try again.
-          </p>
-          <Button onClick={() => router.push('/')}>Return to Home</Button>
-        </Card>
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p>Loading exam environment...</p>
-      </div>
-    );
+  if (!isAuthenticated) {
+    return null;
   }
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="mb-8 space-y-4">
-        <h1 className="text-3xl font-bold">IELTS Speaking Test</h1>
-        <p className="text-gray-600">
-          This is a simulated IELTS speaking test using AI technology. The test
-          is divided into three parts and will take approximately 11-14 minutes.
-        </p>
-      </div>
+    <div className="container mx-auto max-w-4xl py-8">
+      <h1 className="mb-2 text-3xl font-bold">IELTS Speaking Test</h1>
+      <p className="mb-8 text-muted-foreground">
+        The test will take approximately 11-14 minutes.
+      </p>
 
-      <SpeakingParts accessToken={accessToken} />
+      <div className="space-y-4">
+        {/* Part 1 */}
+        <Card className="p-6">
+          <div className="flex items-start justify-between">
+            <div>
+              <h2 className="text-xl font-semibold">
+                Part 1: Introduction and Interview
+              </h2>
+              <p className="text-muted-foreground">
+                General questions about yourself and familiar topics
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Duration: 4-5 minutes
+              </p>
+            </div>
+            {part1Completed ? (
+              <div className="flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1 text-sm font-medium text-primary">
+                <CheckCircle2 className="size-4" />
+                <span>Completed</span>
+              </div>
+            ) : (
+              <Link href="/exam/speaking/part/1">
+                <Button>Start Part 1</Button>
+              </Link>
+            )}
+          </div>
+        </Card>
+
+        {/* Part 2 */}
+        <Card className="p-6">
+          <div className="flex items-start justify-between">
+            <div>
+              <h2 className="text-xl font-semibold">
+                Part 2: Individual Long Turn
+              </h2>
+              <p className="text-muted-foreground">
+                Speak about a particular topic using a task card
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Duration: 3-4 minutes
+              </p>
+            </div>
+            {part2Completed ? (
+              <div className="flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1 text-sm font-medium text-primary">
+                <CheckCircle2 className="size-4" />
+                <span>Completed</span>
+              </div>
+            ) : part1Completed ? (
+              <Link href="/exam/speaking/part/2">
+                <Button>Continue Conversation</Button>
+              </Link>
+            ) : (
+              <div className="flex items-center gap-2 rounded-full bg-muted px-4 py-1 text-sm">
+                <Lock className="size-4" />
+                <span>Complete Part 1 first</span>
+              </div>
+            )}
+          </div>
+        </Card>
+
+        {/* Part 3 */}
+        <Card className="p-6">
+          <div className="flex items-start justify-between">
+            <div>
+              <h2 className="text-xl font-semibold">
+                Part 3: Two-Way Discussion
+              </h2>
+              <p className="text-muted-foreground">
+                Further questions connected to the topic in Part 2
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Duration: 4-5 minutes
+              </p>
+            </div>
+            {part3Completed ? (
+              <div className="flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1 text-sm font-medium text-primary">
+                <CheckCircle2 className="size-4" />
+                <span>Completed</span>
+              </div>
+            ) : part1Completed && part2Completed ? (
+              <Link href="/exam/speaking/part/3">
+                <Button>Start Part 3</Button>
+              </Link>
+            ) : (
+              <div className="flex items-center gap-2 rounded-full bg-muted px-4 py-1 text-sm">
+                <Lock className="size-4" />
+                <span>Complete previous parts</span>
+              </div>
+            )}
+          </div>
+        </Card>
+
+        {part1Completed && part2Completed && part3Completed && (
+          <div className="mt-8 text-center">
+            <Link href="/exam/speaking/results">
+              <Button size="lg">View Results</Button>
+            </Link>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

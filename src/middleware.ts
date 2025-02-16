@@ -33,19 +33,17 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getSession();
 
   // Auth routes - redirect to intended destination or dashboard if already logged in
-  if (request.nextUrl.pathname.startsWith('/auth')) {
-    if (session) {
-      // Check if there's a redirect URL in the query params
-      const redirectTo = request.nextUrl.searchParams.get('redirectTo');
-      if (
-        redirectTo &&
-        (redirectTo.startsWith('/') || redirectTo.startsWith('/exam'))
-      ) {
-        return NextResponse.redirect(new URL(redirectTo, request.url));
-      }
-      // Default redirect to dashboard if no valid redirect URL
-      return NextResponse.redirect(new URL('/', request.url));
+  if (request.nextUrl.pathname.startsWith('/auth') && session) {
+    // Check if there's a redirect URL in the query params
+    const redirectTo = request.nextUrl.searchParams.get('redirectTo');
+    if (
+      redirectTo &&
+      (redirectTo.startsWith('/') || redirectTo.startsWith('/exam'))
+    ) {
+      return NextResponse.redirect(new URL(redirectTo, request.url));
     }
+    // Default redirect to dashboard if no valid redirect URL
+    return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
   return response;

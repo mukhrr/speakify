@@ -15,6 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { useState } from 'react';
+import { Loader2 } from 'lucide-react';
 
 const registerSchema = z
   .object({
@@ -36,7 +37,13 @@ const registerSchema = z
 type RegisterForm = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
-  const { signUp } = useAuth();
+  const {
+    signUp,
+    isLoading: authLoading,
+    isAuthenticated,
+  } = useAuth({
+    redirectIfAuthenticated: true,
+  });
   const [error, setError] = useState<string>('');
 
   const form = useForm<RegisterForm>({
@@ -60,6 +67,21 @@ export default function RegisterPage() {
       );
     }
   };
+
+  if (authLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="flex items-center gap-2">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          <span>Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center">

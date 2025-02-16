@@ -1,11 +1,9 @@
 'use client';
 
 import { Ref } from 'react';
-// import { useVoice } from '@humeai/voice-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { cn } from '@/utils';
-import Expressions from './expressions';
 import { useQuestionMessages } from '@/hooks/useQuestionMessages';
 import { AssistantMessage } from 'hume/api/resources/empathicVoice/types/AssistantMessage';
 interface MessagesProps {
@@ -55,9 +53,6 @@ const Messages = ({ ref, partNumber }: MessagesProps) => {
                 Examiner
               </div>
               <div className={'px-3 pb-3'}>{msg.message?.content}</div>
-              {msg.models?.prosody?.scores && (
-                <Expressions values={msg.models.prosody.scores} />
-              )}
             </motion.div>
           ))}
         </AnimatePresence>

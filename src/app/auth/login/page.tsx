@@ -27,7 +27,12 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const { signIn, signInWithGoogle } = useAuth();
+  const {
+    signIn,
+    signInWithGoogle,
+    isLoading: authLoading,
+    isAuthenticated,
+  } = useAuth({ redirectIfAuthenticated: true });
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -59,6 +64,21 @@ export default function LoginPage() {
       setIsLoading(false);
     }
   };
+
+  if (authLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="flex items-center gap-2">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          <span>Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center">

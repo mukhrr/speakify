@@ -1,47 +1,32 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { cn } from '@/utils';
 
 interface TimerProps {
-  isRunning: boolean;
-  maxTime?: number;
-  onTimeUp?: () => void;
+  timeLeft: number;
+  isPreparationTime: boolean;
 }
 
-export function Timer({ isRunning, maxTime, onTimeUp }: TimerProps) {
-  const [time, setTime] = useState(0);
+export function Timer({ timeLeft, isPreparationTime }: TimerProps) {
+  const minutes = Math.floor(timeLeft / 60);
+  const seconds = timeLeft % 60;
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-
-    if (isRunning) {
-      interval = setInterval(() => {
-        setTime((prevTime) => {
-          const newTime = prevTime + 1;
-          if (maxTime && newTime >= maxTime) {
-            onTimeUp?.();
-            return maxTime;
-          }
-          return newTime;
-        });
-      }, 1000);
-    }
-
-    return () => {
-      if (interval) {
-        clearInterval(interval);
-      }
-    };
-  }, [isRunning, maxTime, onTimeUp]);
-
-  const minutes = Math.floor(time / 60);
-  const seconds = time % 60;
+  const formattedTime = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  const isLowTime = timeLeft <= 30; // Last 30 seconds
 
   return (
-    <div className="shadow-glow rounded-lg bg-secondary px-4 py-2">
-      <span className="font-mono text-lg font-medium text-secondary-foreground">
-        {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
+    <div
+      className={cn(
+        'rounded-md border px-3 py-1 text-sm font-medium',
+        isLowTime
+          ? 'animate-pulse border-red-200 bg-red-50 text-red-700'
+          : 'border-border bg-background text-foreground'
+      )}
+    >
+      <span className="mr-2 text-muted-foreground">
+        {isPreparationTime ? 'Preparation' : 'Speaking'}:
       </span>
+      <span className={cn(isLowTime && 'text-red-700')}>{formattedTime}</span>
     </div>
   );
 }
