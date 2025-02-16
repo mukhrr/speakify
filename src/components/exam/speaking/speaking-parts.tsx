@@ -82,6 +82,11 @@ export function SpeakingParts({ accessToken }: SpeakingPartsProps) {
       )
     );
     setActivePart(null);
+    if (partId === 3) {
+      router.push('/exam/speaking/results');
+    } else {
+      router.push('/exam/speaking');
+    }
   };
 
   // Handle completion from Controls component

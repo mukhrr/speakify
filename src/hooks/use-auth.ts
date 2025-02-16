@@ -1,6 +1,7 @@
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { useCallback, useEffect, useState } from 'react';
+import { Session } from '@supabase/supabase-js';
 
 interface UseAuthOptions {
   redirectTo?: string;
@@ -15,7 +16,36 @@ export function useAuth({
 }: UseAuthOptions = {}) {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const router = useRouter();
+
+  const updateAuthState = useCallback(
+    (session: Session | null) => {
+      const authenticated = !!session;
+      setIsAuthenticated(authenticated);
+      onAuthStateChange?.(authenticated);
+
+      // Store or remove user ID in session storage
+      if (session?.user?.id) {
+        sessionStorage.setItem('user-id', session.user.id);
+        setUserId(session.user.id);
+      } else {
+        sessionStorage.removeItem('user-id');
+        sessionStorage.removeItem('current-test-id');
+        setUserId(null);
+      }
+
+      if (!authenticated && redirectTo) {
+        const currentPath = window.location.pathname;
+        router.push(`${redirectTo}?redirectTo=${currentPath}`);
+      }
+
+      if (authenticated && redirectIfAuthenticated) {
+        router.push('/dashboard');
+      }
+    },
+    [router, redirectTo, onAuthStateChange, redirectIfAuthenticated]
+  );
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -23,19 +53,7 @@ export function useAuth({
         const {
           data: { session },
         } = await supabase.auth.getSession();
-
-        const authenticated = !!session;
-        setIsAuthenticated(authenticated);
-        onAuthStateChange?.(authenticated);
-
-        if (!authenticated && redirectTo) {
-          const currentPath = window.location.pathname;
-          router.push(`${redirectTo}?redirectTo=${currentPath}`);
-        }
-
-        if (authenticated && redirectIfAuthenticated) {
-          router.push('/dashboard');
-        }
+        updateAuthState(session);
       } catch (error) {
         console.error('Auth check failed:', error);
         if (redirectTo) {
@@ -53,24 +71,13 @@ export function useAuth({
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      const authenticated = !!session;
-      setIsAuthenticated(authenticated);
-      onAuthStateChange?.(authenticated);
-
-      if (!authenticated && redirectTo) {
-        const currentPath = window.location.pathname;
-        router.push(`${redirectTo}?redirectTo=${currentPath}`);
-      }
-
-      if (authenticated && redirectIfAuthenticated) {
-        router.push('/dashboard');
-      }
+      updateAuthState(session);
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [router, redirectTo, onAuthStateChange, redirectIfAuthenticated]);
+  }, [router, redirectTo, updateAuthState]);
 
   const signIn = useCallback(
     async (email: string, password: string) => {
@@ -131,6 +138,7 @@ export function useAuth({
   return {
     isLoading,
     isAuthenticated,
+    userId,
     signIn,
     signUp,
     signOut,

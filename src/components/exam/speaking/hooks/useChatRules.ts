@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { JSONMessage } from '@humeai/voice-react';
-import { storeSpeakingPartResult, SpeakingResult } from '@/lib/hume/analysis';
+import { savePartResult } from '@/lib/supabase/speaking-results';
+import { useAuth } from '@/hooks/use-auth';
 
 interface UseChatRulesProps {
   partNumber: 1 | 2 | 3;
@@ -19,6 +20,7 @@ export function useChatRules({
   messagesRef,
 }: UseChatRulesProps): ChatRules {
   const timeout = useRef<number | null>(null);
+  const { userId } = useAuth();
 
   const configId =
     partNumber === 1
@@ -43,67 +45,45 @@ export function useChatRules({
     }, 200);
   };
 
-  const extractOverallScore = (content: string): number | null => {
-    const match = content.match(/overall score:\s*(\d+(\.\d+)?)/i);
-    return match ? parseFloat(match[1]) : null;
-  };
-
   const extractScores = (content: string) => {
-    const scores = {
-      fluency: 0,
-      pronunciation: 0,
-      grammar: 0,
-      vocabulary: 0,
-      overall: 0,
+    const match = content.match(/overall score:\s*(\d+(\.\d+)?)/i);
+    if (!match) return null;
+
+    const overallScore = parseFloat(match[1]);
+
+    // Since we only get overall score, use it for all criteria
+    return {
+      fluency: overallScore,
+      pronunciation: overallScore,
+      grammar: overallScore,
+      vocabulary: overallScore,
+      overall: overallScore,
     };
-
-    const scorePatterns = {
-      fluency: /fluency:\s*(\d+(\.\d+)?)/i,
-      pronunciation: /pronunciation:\s*(\d+(\.\d+)?)/i,
-      grammar: /grammar:\s*(\d+(\.\d+)?)/i,
-      vocabulary: /vocabulary:\s*(\d+(\.\d+)?)/i,
-      overall: /overall:\s*(\d+(\.\d+)?)/i,
-    };
-
-    let foundAny = false;
-    Object.entries(scorePatterns).forEach(([key, pattern]) => {
-      const match = content.match(pattern);
-      if (match) {
-        scores[key as keyof typeof scores] = parseFloat(match[1]);
-        foundAny = true;
-      }
-    });
-
-    return foundAny ? scores : null;
   };
 
-  const extractFeedback = (content: string): string[] => {
-    const feedbackSection = content.split(/feedback:/i)[1];
-    if (!feedbackSection) return [];
+  const handlePartCompletion = async (content: string) => {
+    if (!userId) return;
 
-    return feedbackSection
-      .split(/[.•\n]/)
-      .map((item) => item.trim())
-      .filter((item) => item.length > 0);
-  };
+    const scores = extractScores(content);
+    if (!scores) return;
 
-  const handlePartCompletion = async (summary: SpeakingResult) => {
-    const result: SpeakingResult = {
+    const testId = sessionStorage.getItem('current-test-id');
+    if (!testId) return;
+
+    const partResult = {
       partNumber,
-      scores: {
-        fluency: summary.scores.fluency || 0,
-        pronunciation: summary.scores.pronunciation || 0,
-        grammar: summary.scores.grammar || 0,
-        vocabulary: summary.scores.vocabulary || 0,
-        overall: summary.scores.overall || 0,
-      },
-      feedback: summary.feedback || [],
-      summary: summary.summary || '',
+      scores,
+      feedback: [],
+      summary: content,
       timestamp: new Date().toISOString(),
     };
 
-    await storeSpeakingPartResult(result);
-    onCompleteAction(partNumber);
+    try {
+      await savePartResult(userId, testId, partResult);
+      onCompleteAction(partNumber);
+    } catch (error) {
+      console.error('Error saving part result:', error);
+    }
   };
 
   const handleMessage = (message: JSONMessage) => {
@@ -111,39 +91,11 @@ export function useChatRules({
       message.type === 'assistant_message' &&
       typeof message.message?.content === 'string'
     ) {
-      if (
-        message.message.content
-          .toLowerCase()
-          .includes('here is your assessment')
-      ) {
-        const scores = extractScores(message.message.content);
-        if (scores) {
-          handlePartCompletion({
-            partNumber,
-            scores,
-            feedback: extractFeedback(message.message.content),
-            summary: message.message.content,
-            timestamp: new Date().toISOString(),
-          });
-        }
-      }
+      const content = message.message.content;
 
-      const score = extractOverallScore(message.message.content);
-      if (score !== null) {
-        const result: SpeakingResult = {
-          partNumber,
-          scores: {
-            fluency: score,
-            pronunciation: score,
-            grammar: score,
-            vocabulary: score,
-            overall: score,
-          },
-          feedback: ['Score extracted from overall assessment'],
-          summary: message.message.content,
-          timestamp: new Date().toISOString(),
-        };
-        storeSpeakingPartResult(result);
+      if (content.toLowerCase().includes('overall score')) {
+        console.log('TEST IS COMPLETE', content);
+        handlePartCompletion(content);
       }
     }
 

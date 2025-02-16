@@ -3,16 +3,18 @@
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchAccessToken } from 'hume';
+import { Loader2 } from 'lucide-react';
 import Chat from '@/components/exam/speaking/chat';
 import { useExamPartsStatus } from '@/hooks/useExamPartsStatus';
 import { useAuth } from '@/hooks/use-auth';
-import { Loader2 } from 'lucide-react';
 
 interface PageProps {
   params: Promise<{
     id: string;
   }>;
 }
+
+const STORAGE_KEY = 'speaking-part-';
 
 export default function SpeakingPartPage({ params }: PageProps) {
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -43,24 +45,44 @@ export default function SpeakingPartPage({ params }: PageProps) {
       return;
     }
 
-    // Initialize Hume
-    const initializeHume = async () => {
+    // Initialize test and Hume
+    const initialize = async () => {
       try {
+        // Initialize Hume
         const token = await fetchAccessToken({
           apiKey: process.env.NEXT_PUBLIC_HUME_API_KEY!,
           secretKey: process.env.NEXT_PUBLIC_HUME_SECRET_KEY!,
         });
         setAccessToken(token);
+
+        // Mark part as in progress
+        sessionStorage.setItem(
+          `${STORAGE_KEY}${partNumber}-status`,
+          'in-progress'
+        );
       } catch (error) {
-        console.error('Failed to initialize Hume:', error);
+        console.error('Failed to initialize:', error);
         router.push('/exam/speaking');
       } finally {
         setLoading(false);
       }
     };
 
-    initializeHume();
+    initialize();
   }, [partNumber, router, part1Completed, part2Completed, isAuthenticated]);
+
+  const handlePartCompletion = () => {
+    // Mark part as completed
+    sessionStorage.setItem(`${STORAGE_KEY}${partNumber}`, 'completed');
+    sessionStorage.setItem(`${STORAGE_KEY}${partNumber}-status`, 'completed');
+
+    // Navigate based on part number
+    if (partNumber === 3) {
+      router.push('/exam/speaking/results');
+    } else {
+      router.push('/exam/speaking');
+    }
+  };
 
   // Show loading state while checking auth
   if (authLoading) {
@@ -104,9 +126,7 @@ export default function SpeakingPartPage({ params }: PageProps) {
       <Chat
         accessToken={accessToken}
         partNumber={partNumber}
-        onCompleteAction={() => {
-          router.push('/exam/speaking');
-        }}
+        onCompleteAction={handlePartCompletion}
       />
     </div>
   );

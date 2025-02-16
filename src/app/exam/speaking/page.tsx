@@ -3,10 +3,12 @@
 import { CheckCircle2, Lock, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
-import { useExamPartsStatus } from '@/hooks/useExamPartsStatus';
-import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+
+import { useExamPartsStatus } from '@/hooks/useExamPartsStatus';
+import { useExamResults } from '@/hooks/useExamResults';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function SpeakingExamPage() {
   const {
@@ -16,7 +18,7 @@ export default function SpeakingExamPage() {
     isLoading: partsLoading,
   } = useExamPartsStatus();
   const { isLoading: authLoading, isAuthenticated } = useAuth();
-
+  const { startNewTest } = useExamResults();
   if (authLoading || partsLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -61,7 +63,7 @@ export default function SpeakingExamPage() {
               </div>
             ) : (
               <Link href="/exam/speaking/part/1">
-                <Button>Start Part 1</Button>
+                <Button onClick={() => startNewTest()}>Start Part 1</Button>
               </Link>
             )}
           </div>

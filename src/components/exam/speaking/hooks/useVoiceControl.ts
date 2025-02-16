@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useVoice } from '@humeai/voice-react';
-import { useRouter } from 'next/navigation';
 
 interface UseVoiceControlProps {
   partNumber: 1 | 2 | 3;
@@ -19,7 +18,6 @@ export function useVoiceControl({
   onCompleteAction,
 }: UseVoiceControlProps): VoiceControl {
   const voice = useVoice();
-  const router = useRouter();
   const [isScoring, setIsScoring] = useState(false);
   const { messages, muteAudio, unmuteAudio, isAudioMuted, disconnect } = voice;
 
@@ -39,32 +37,34 @@ export function useVoiceControl({
       // Check for scoring message to show loading state
       if (
         lastMessage.type === 'assistant_message' &&
-        typeof lastMessage.message?.content === 'string' &&
-        lastMessage.message.content.toLowerCase().includes('overall score')
+        typeof lastMessage.message?.content === 'string'
       ) {
-        muteAudio();
-        setIsScoring(true);
+        if (
+          lastMessage.message.content.toLowerCase().includes('overall score')
+        ) {
+          muteAudio();
+          setIsScoring(true);
+        }
+
+        if (
+          lastMessage.message.content.toLowerCase().includes("let's move on")
+        ) {
+          unmuteAudio();
+          setIsScoring(false);
+        }
       }
 
-      // Handle call completion on assistant_end
-      if (lastMessage.type === 'assistant_end') {
-        // Short delay to ensure scoring state is shown
-        const timer = setTimeout(() => {
-          disconnect();
-          onCompleteAction(partNumber);
-
-          // Navigate based on part number
-          if (partNumber === 3) {
-            router.push('/exam/speaking/results');
-          } else {
-            router.push('/exam/speaking');
-          }
-        }, 1500); // 1.5 seconds delay
-
-        return () => clearTimeout(timer);
-      }
+      // @ts-expect-error message name is not typed
+      if (lastMessage.name === 'hang_up') onCompleteAction(partNumber);
     }
-  }, [messages, muteAudio, disconnect, onCompleteAction, partNumber, router]);
+  }, [
+    messages,
+    muteAudio,
+    unmuteAudio,
+    disconnect,
+    onCompleteAction,
+    partNumber,
+  ]);
 
   return {
     isScoring,
