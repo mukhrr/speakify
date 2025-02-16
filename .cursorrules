@@ -4,6 +4,21 @@
 
 - To create a platform for users to practice IELTS speaking exams where they can get instant feedback on their performance. Users should feel real online speaking exam experience.
 
+# Hume AI
+
+- Hume AI is a tool that can be used to generate realistic speaking exam feedback.
+
+# Interactions with Hume AI
+
+- When the user starts the exam, the AI will generate a random question.
+- The user will then respond to the question.
+- The AI will then generate a feedback for the user's response.
+- The feedback will be displayed to the user.
+
+# Integrations with Hume AI
+
+- We have three configurations in HUME AI platform: Speaking Part 1, Speaking Part 2, and Speaking Part 3. And we connect to configurations via configuration IDs to VoiceControl component of Hume AI. We configured each configuration to generate a random question and a feedback for the user's response. We gave custom IELTS speaking exam instructions and prompts to each configuration.
+
 ## Tech Stack
 
 ⚛️ **Core**
