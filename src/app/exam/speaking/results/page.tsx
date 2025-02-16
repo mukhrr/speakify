@@ -66,7 +66,7 @@ const ScoreCard = ({
 };
 
 export default function ResultsPage() {
-  const { part1, part2, part3, overallScore, isLoading } = useExamResults();
+  const { currentTest, isLoading } = useExamResults();
 
   if (isLoading) {
     return (
@@ -83,11 +83,11 @@ export default function ResultsPage() {
     <div className="container mx-auto max-w-4xl py-8">
       <h1 className="mb-8 text-3xl font-bold">Speaking Test Results</h1>
 
-      {overallScore ? (
+      {currentTest?.overallBandScore ? (
         <div className="mb-8 rounded-lg border bg-primary/5 p-6">
           <p className="text-lg text-primary">Overall Speaking Score</p>
           <p className="text-5xl font-bold text-primary">
-            {overallScore.toFixed(1)}
+            {currentTest.overallBandScore.toFixed(1)}
           </p>
         </div>
       ) : (
@@ -101,18 +101,18 @@ export default function ResultsPage() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <ScoreCard
           title="Part 1: Introduction and Interview"
-          scores={part1?.scores ?? null}
-          feedback={part1?.feedback ?? null}
+          scores={currentTest?.part1?.scores ?? null}
+          feedback={currentTest?.part1?.feedback ?? null}
         />
         <ScoreCard
           title="Part 2: Individual Long Turn"
-          scores={part2?.scores ?? null}
-          feedback={part2?.feedback ?? null}
+          scores={currentTest?.part2?.scores ?? null}
+          feedback={currentTest?.part2?.feedback ?? null}
         />
         <ScoreCard
           title="Part 3: Two-Way Discussion"
-          scores={part3?.scores ?? null}
-          feedback={part3?.feedback ?? null}
+          scores={currentTest?.part3?.scores ?? null}
+          feedback={currentTest?.part3?.feedback ?? null}
         />
       </div>
     </div>

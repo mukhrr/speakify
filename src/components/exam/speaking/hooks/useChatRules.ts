@@ -46,19 +46,37 @@ export function useChatRules({
   };
 
   const extractScores = (content: string) => {
-    const match = content.match(/overall score:\s*(\d+(\.\d+)?)/i);
-    if (!match) return null;
-
-    const overallScore = parseFloat(match[1]);
-
-    // Since we only get overall score, use it for all criteria
-    return {
-      fluency: overallScore,
-      pronunciation: overallScore,
-      grammar: overallScore,
-      vocabulary: overallScore,
-      overall: overallScore,
+    const scores = {
+      fluency: 0,
+      pronunciation: 0,
+      grammar: 0,
+      vocabulary: 0,
+      overall: 0,
     };
+
+    const fluencyMatch = content.match(/fluency:\s*(\d+(\.\d+)?)/i);
+    const pronunciationMatch = content.match(/pronunciation:\s*(\d+(\.\d+)?)/i);
+    const grammarMatch = content.match(/grammar:\s*(\d+(\.\d+)?)/i);
+    const vocabularyMatch = content.match(/vocabulary:\s*(\d+(\.\d+)?)/i);
+    const overallMatch = content.match(/overall:\s*(\d+(\.\d+)?)/i);
+
+    if (
+      !fluencyMatch ||
+      !pronunciationMatch ||
+      !grammarMatch ||
+      !vocabularyMatch ||
+      !overallMatch
+    ) {
+      return null;
+    }
+
+    scores.fluency = parseFloat(fluencyMatch[1]);
+    scores.pronunciation = parseFloat(pronunciationMatch[1]);
+    scores.grammar = parseFloat(grammarMatch[1]);
+    scores.vocabulary = parseFloat(vocabularyMatch[1]);
+    scores.overall = parseFloat(overallMatch[1]);
+
+    return scores;
   };
 
   const handlePartCompletion = async (content: string) => {
@@ -93,8 +111,7 @@ export function useChatRules({
     ) {
       const content = message.message.content;
 
-      if (content.toLowerCase().includes('overall score')) {
-        console.log('TEST IS COMPLETE', content);
+      if (content.toLowerCase().includes('fluency: ')) {
         handlePartCompletion(content);
       }
     }
