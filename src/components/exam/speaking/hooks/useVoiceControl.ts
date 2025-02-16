@@ -43,13 +43,6 @@ export function useVoiceControl({
           muteAudio();
           setIsScoring(true);
         }
-
-        if (
-          lastMessage.message.content.toLowerCase().includes("let's move on")
-        ) {
-          unmuteAudio();
-          setIsScoring(false);
-        }
       }
 
       // @ts-expect-error message name is not typed
