@@ -12,7 +12,7 @@ export function Timer({ timeLeft, isPreparationTime }: TimerProps) {
   const seconds = timeLeft % 60;
 
   const formattedTime = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  const isLowTime = timeLeft <= 30; // Last 30 seconds
+  const isLowTime = timeLeft <= 10; // Last 10 seconds
 
   return (
     <div

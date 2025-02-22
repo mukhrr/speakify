@@ -3,7 +3,7 @@
 import { useExamResults } from '@/hooks/useExamResults';
 import { useAuth } from '@/hooks/use-auth';
 import { format } from 'date-fns';
-import { Loader2 } from 'lucide-react';
+import { CheckCircle2, Loader2, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
@@ -54,25 +54,31 @@ export default function HistoryPage() {
               <div className="mb-4 flex items-start justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">
+                    Started at{' '}
                     {test.createdAt &&
                       format(new Date(test.createdAt), 'PPP p')}
                   </p>
                   <div className="mt-1 flex items-center gap-3">
                     <h3 className="text-xl font-semibold">
-                      Speaking Test{' '}
+                      Overall Score:{' '}
                       {test.status === 'completed' && (
                         <span className="text-primary">
-                          {test.overallBandScore?.toFixed(1)}
+                          {Math.round(test.overallBandScore ?? 0)}
                         </span>
                       )}
                     </h3>
                     <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                      className={`flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
                         test.status === 'completed'
                           ? 'bg-primary/10 text-primary'
                           : 'bg-muted text-muted-foreground'
                       }`}
                     >
+                      {test.status === 'completed' ? (
+                        <CheckCircle2 className="mr-1 inline-block h-3.5 w-3.5 text-emerald-500" />
+                      ) : (
+                        <Clock className="mr-1 inline-block h-3.5 w-3.5 text-muted-foreground" />
+                      )}
                       {test.status === 'completed'
                         ? 'Completed'
                         : 'In Progress'}
@@ -94,7 +100,7 @@ export default function HistoryPage() {
                     <p className="mb-2 font-medium">
                       Part {index + 1}:{' '}
                       {part ? (
-                        <span className="text-primary">
+                        <span className="text-muted-foreground">
                           {part.scores.overall.toFixed(1)}
                         </span>
                       ) : (
@@ -105,12 +111,12 @@ export default function HistoryPage() {
                     </p>
                     {part && (
                       <div className="grid grid-cols-2 gap-2 text-sm">
-                        <div>
+                        {/* <div>
                           <p className="text-muted-foreground">Overall</p>
                           <p className="font-medium">
                             {part.scores.overall.toFixed(1)}
                           </p>
-                        </div>
+                        </div> */}
                         {/* <div>
                           <p className="text-muted-foreground">Pronunciation</p>
                           <p className="font-medium">

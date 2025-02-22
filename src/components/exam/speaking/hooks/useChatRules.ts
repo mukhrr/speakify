@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { JSONMessage } from '@humeai/voice-react';
 import { savePartResult } from '@/lib/supabase/speaking-results';
 import { useAuth } from '@/hooks/use-auth';
+import { generateFeedback } from '@/lib/hume/analysis';
 
 interface UseChatRulesProps {
   partNumber: 1 | 2 | 3;
@@ -80,7 +81,7 @@ export function useChatRules({
     const partResult = {
       partNumber,
       scores,
-      feedback: [],
+      feedback: generateFeedback(scores),
       summary: content,
       timestamp: new Date().toISOString(),
     };

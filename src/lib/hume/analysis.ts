@@ -1,8 +1,4 @@
 export interface SpeakingScores {
-  fluency: number;
-  pronunciation: number;
-  grammar: number;
-  vocabulary: number;
   overall: number;
 }
 
@@ -92,37 +88,51 @@ export const analyzeSpeakingTest = async (
 // Generate feedback based on scores and analysis
 export function generateFeedback(scores: SpeakingResult['scores']): string[] {
   const feedback: string[] = [];
+  const overall = scores.overall;
 
-  if (scores.fluency >= 7.5) {
-    feedback.push('Excellent fluency with natural flow of speech');
-  } else if (scores.fluency >= 6.5) {
-    feedback.push('Good fluency with occasional hesitation');
+  if (overall >= 8.5) {
+    feedback.push(
+      'Speaks fluently with only rare repetition or self-correction'
+    );
+    feedback.push('Uses a full range of pronunciation features with precision');
+    feedback.push(
+      'Uses a wide range of complex structures with full flexibility'
+    );
+    feedback.push(
+      'Uses precise vocabulary with natural and sophisticated control'
+    );
+  } else if (overall >= 7.5) {
+    feedback.push('Speaks at length without noticeable effort');
+    feedback.push(
+      'Shows all the positive features of Band 7 and some of Band 9'
+    );
+    feedback.push('Uses a wide range of structures with good flexibility');
+    feedback.push('Uses vocabulary flexibly and effectively');
+  } else if (overall >= 6.5) {
+    feedback.push(
+      'Willing to speak at length, though may lose coherence at times'
+    );
+    feedback.push(
+      'Can generally be understood throughout, with some pronunciation errors'
+    );
+    feedback.push(
+      'Uses a mix of simple and complex structures with some flexibility'
+    );
+    feedback.push('Has a good range of vocabulary for familiar topics');
+  } else if (overall >= 5.5) {
+    feedback.push(
+      'Can usually maintain flow of speech but uses repetition and self-correction'
+    );
+    feedback.push('Can be understood despite pronunciation errors');
+    feedback.push('Uses basic sentence forms with limited accuracy');
+    feedback.push('Uses adequate vocabulary for basic discussions');
   } else {
-    feedback.push('Work on improving speech fluency and reducing hesitation');
-  }
-
-  if (scores.pronunciation >= 7.5) {
-    feedback.push('Clear and accurate pronunciation throughout');
-  } else if (scores.pronunciation >= 6.5) {
-    feedback.push('Generally clear pronunciation with some minor errors');
-  } else {
-    feedback.push('Focus on improving pronunciation clarity');
-  }
-
-  if (scores.grammar >= 7.5) {
-    feedback.push('Excellent use of complex grammatical structures');
-  } else if (scores.grammar >= 6.5) {
-    feedback.push('Good grammar with occasional errors');
-  } else {
-    feedback.push('Practice using more complex grammatical structures');
-  }
-
-  if (scores.vocabulary >= 7.5) {
-    feedback.push('Rich and varied vocabulary usage');
-  } else if (scores.vocabulary >= 6.5) {
-    feedback.push('Good range of vocabulary with some repetition');
-  } else {
-    feedback.push('Work on expanding vocabulary range');
+    feedback.push('Speaks with long pauses and limited expression');
+    feedback.push(
+      'Shows basic pronunciation errors that may cause strain for the listener'
+    );
+    feedback.push('Uses simple sentences with frequent grammatical errors');
+    feedback.push('Uses limited vocabulary that restricts discussion');
   }
 
   return feedback;

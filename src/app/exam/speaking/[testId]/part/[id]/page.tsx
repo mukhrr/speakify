@@ -23,7 +23,9 @@ export default function SpeakingPartPage() {
   const { currentTest } = useExamResults();
 
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated || !testId) return;
+
+    sessionStorage.setItem('current-test-id', testId);
 
     // Validate part number
     if (![1, 2, 3].includes(partNumber)) {

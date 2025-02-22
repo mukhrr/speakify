@@ -6,6 +6,7 @@ import {
   getTestResult,
   getUserTestHistory,
 } from '@/lib/supabase/speaking-results';
+import { useParams } from 'next/navigation';
 
 interface UseExamResults {
   currentTest: TestResult | null;
@@ -20,10 +21,12 @@ export function useExamResults(): UseExamResults {
   const [testHistory, setTestHistory] = useState<TestResult[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { isAuthenticated, userId } = useAuth();
+  const params = useParams();
 
   // Load current test from session storage
   const loadCurrentTest = async () => {
-    const testId = sessionStorage.getItem('current-test-id');
+    const testId =
+      sessionStorage.getItem('current-test-id') || (params?.testId as string);
     if (!testId || !isAuthenticated || !userId) return null;
 
     try {
