@@ -80,7 +80,7 @@ export default function HistoryPage() {
                   </div>
                 </div>
                 {test.status === 'in_progress' && (
-                  <Link href="/exam/speaking">
+                  <Link href={`/exam/speaking/${test.testId}`}>
                     <Button variant="outline" size="sm">
                       Continue Test
                     </Button>
@@ -106,12 +106,12 @@ export default function HistoryPage() {
                     {part && (
                       <div className="grid grid-cols-2 gap-2 text-sm">
                         <div>
-                          <p className="text-muted-foreground">Fluency</p>
+                          <p className="text-muted-foreground">Overall</p>
                           <p className="font-medium">
-                            {part.scores.fluency.toFixed(1)}
+                            {part.scores.overall.toFixed(1)}
                           </p>
                         </div>
-                        <div>
+                        {/* <div>
                           <p className="text-muted-foreground">Pronunciation</p>
                           <p className="font-medium">
                             {part.scores.pronunciation.toFixed(1)}
@@ -128,7 +128,7 @@ export default function HistoryPage() {
                           <p className="font-medium">
                             {part.scores.vocabulary.toFixed(1)}
                           </p>
-                        </div>
+                        </div> */}
                       </div>
                     )}
                   </div>

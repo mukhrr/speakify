@@ -4,10 +4,6 @@ import { supabase } from '@/lib/supabase/client';
 export interface PartResult {
   partNumber: 1 | 2 | 3;
   scores: {
-    fluency: number;
-    pronunciation: number;
-    grammar: number;
-    vocabulary: number;
     overall: number;
   };
   feedback: string[];

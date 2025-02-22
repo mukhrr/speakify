@@ -31,10 +31,6 @@ export type Database = {
           results: {
             partNumber: number;
             scores: {
-              fluency: number;
-              pronunciation: number;
-              grammar: number;
-              vocabulary: number;
               overall: number;
             };
             feedback: string[];

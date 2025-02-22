@@ -91,7 +91,7 @@ export default function SpeakingExamPage() {
               </div>
             ) : part1Completed ? (
               <Link href={`/exam/speaking/${testId}/part/2`}>
-                <Button>Continue Conversation</Button>
+                <Button>Start Part 2</Button>
               </Link>
             ) : (
               <div className="flex items-center gap-2 rounded-full bg-muted px-4 py-1 text-sm">

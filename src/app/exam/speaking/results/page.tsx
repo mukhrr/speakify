@@ -10,10 +10,6 @@ const ScoreCard = ({
 }: {
   title: string;
   scores: {
-    fluency: number;
-    pronunciation: number;
-    grammar: number;
-    vocabulary: number;
     overall: number;
   } | null;
   feedback: string[] | null;
@@ -23,7 +19,7 @@ const ScoreCard = ({
   return (
     <div className="rounded-lg border bg-card p-6">
       <h3 className="mb-4 text-lg font-semibold">{title}</h3>
-      <div className="mb-4 grid grid-cols-2 gap-4">
+      {/* <div className="mb-4 grid grid-cols-2 gap-4">
         <div>
           <p className="text-sm text-muted-foreground">Fluency</p>
           <p className="text-2xl font-semibold">{scores.fluency.toFixed(1)}</p>
@@ -44,7 +40,7 @@ const ScoreCard = ({
             {scores.vocabulary.toFixed(1)}
           </p>
         </div>
-      </div>
+      </div> */}
       <div className="mb-4">
         <p className="text-sm text-muted-foreground">Overall Score</p>
         <p className="text-3xl font-bold text-primary">
