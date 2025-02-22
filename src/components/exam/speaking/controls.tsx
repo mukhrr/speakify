@@ -29,9 +29,7 @@ export default function Controls({
     handleMuteToggle,
     disconnect: disconnectMic,
     micFft,
-  } = useMicControl({
-    partNumber,
-  });
+  } = useMicControl();
 
   const {
     isScoring,

@@ -100,7 +100,7 @@ export function useChatRules({
     ) {
       const content = message.message.content;
 
-      if (content.toLowerCase().includes('overall: ')) {
+      if (content.toLowerCase().includes('overall:')) {
         handlePartCompletion(content);
       }
     }

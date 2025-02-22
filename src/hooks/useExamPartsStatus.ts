@@ -20,9 +20,9 @@ export function useExamPartsStatus(): ExamPartsStatus {
   useEffect(() => {
     if (!isLoading && currentTest) {
       setPartsStatus({
-        part1Completed: !!currentTest.part1,
-        part2Completed: !!currentTest.part2,
-        part3Completed: !!currentTest.part3,
+        part1Completed: !!currentTest.part1?.id,
+        part2Completed: !!currentTest.part2?.id,
+        part3Completed: !!currentTest.part3?.id,
         isLoading: false,
       });
     }

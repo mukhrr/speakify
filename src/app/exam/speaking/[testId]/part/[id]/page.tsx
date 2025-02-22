@@ -32,12 +32,12 @@ export default function SpeakingPartPage() {
     }
 
     // Check if previous parts are completed
-    if (partNumber === 2 && !part1Completed) {
+    if (partNumber === 2 && !part1Completed && !loading) {
       router.push(`/exam/speaking/${testId}`);
       return;
     }
 
-    if (partNumber === 3 && (!part1Completed || !part2Completed)) {
+    if (partNumber === 3 && (!part1Completed || !part2Completed) && !loading) {
       router.push(`/exam/speaking/${testId}`);
       return;
     }

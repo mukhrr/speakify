@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabase/client';
 
 // Types for individual part results
 export interface PartResult {
+  id?: string;
   partNumber: 1 | 2 | 3;
   scores: {
     overall: number;

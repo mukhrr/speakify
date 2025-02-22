@@ -39,7 +39,7 @@ export function useVoiceControl({
         lastMessage.type === 'assistant_message' &&
         typeof lastMessage.message?.content === 'string'
       ) {
-        if (lastMessage.message.content.toLowerCase().includes('fluency')) {
+        if (lastMessage.message.content.toLowerCase().includes('overall')) {
           muteAudio();
           setIsScoring(true);
         }

@@ -29,14 +29,14 @@ export function useExamTimer({ partNumber }: UseExamTimerProps): ExamTimer {
         const content = lastMessage.message.content.toLowerCase();
 
         // Start preparation timer (1 minute)
-        if (content.includes('one minute to prepare')) {
+        if (content.includes('you can make notes if you wish')) {
           setTimeLeft(60); // 60 seconds
           setIsPreparationTime(true);
           setIsRunning(true);
         }
 
         // Start speaking timer (2 minutes)
-        if (content.includes("let's start if you are ready")) {
+        if (content.includes('please begin speaking.')) {
           setTimeLeft(120); // 120 seconds
           setIsPreparationTime(false);
           setIsRunning(true);
