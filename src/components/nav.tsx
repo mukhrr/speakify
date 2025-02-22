@@ -144,11 +144,11 @@ export function MainNav() {
                     </div>
                   </div>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
+                  <DropdownMenuItem asChild className="cursor-pointer">
                     <Link href="/dashboard">Dashboard</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/exam/speaking">Speaking Test</Link>
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link href="/dashboard/history">Results History</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <AlertDialog>
