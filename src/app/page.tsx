@@ -11,6 +11,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { Metadata } from 'next';
+import { FeedbackImage } from '@/components/feedback-image';
 
 // Enhanced metadata for the home page
 export const metadata: Metadata = {
@@ -23,12 +24,21 @@ export const metadata: Metadata = {
       'Master IELTS speaking with our AI-powered examiner. Get real-time feedback and improve your band score.',
     images: [
       {
-        url: '/og-image.jpg',
+        url: '/images/main-page.png',
         width: 1200,
-        height: 630,
-        alt: 'Speakify IELTS Speaking Practice',
+        height: 675,
+        alt: 'IELTS Speaking Practice Platform - Professional AI examiner interface',
       },
     ],
+    type: 'website',
+    siteName: 'Speakify IELTS',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Speakify IELTS - Practice IELTS Speaking with AI Examiner',
+    description:
+      'Master IELTS speaking with our AI-powered examiner. Get real-time feedback and improve your band score.',
+    images: ['/images/main-page.png'],
   },
 };
 
@@ -223,6 +233,71 @@ export default function HomePage() {
                 4-5 minutes of in-depth discussion related to your Part 2 topic,
                 with follow-up questions and detailed responses.
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Results Showcase Section */}
+      <section className="relative overflow-hidden border-t bg-muted/10 py-20">
+        <div className="container relative mx-auto max-w-6xl px-4">
+          <div className="mb-12 text-center">
+            <h2 className="mb-4 text-3xl font-bold">
+              Professional IELTS Examiner Feedback
+            </h2>
+            <p className="mx-auto max-w-2xl text-muted-foreground">
+              Get detailed feedback and scoring for each part of your speaking
+              test, just like in the official IELTS exam
+            </p>
+          </div>
+
+          <div className="mx-auto max-w-4xl">
+            <div className="group relative rounded-xl border bg-card p-2 shadow-lg transition-all hover:shadow-xl sm:p-4">
+              <div className="aspect-[16/10] overflow-hidden rounded-lg">
+                <FeedbackImage />
+              </div>
+              <div className="mt-6 grid gap-4 px-2 text-center sm:grid-cols-3">
+                <div>
+                  <h4 className="text-xl font-bold text-primary">
+                    Part 1: 9.0
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    Introduction & Interview
+                  </p>
+                </div>
+                <div>
+                  <h4 className="text-xl font-bold text-primary">
+                    Part 2: 9.0
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    Long Turn Speech
+                  </p>
+                </div>
+                <div>
+                  <h4 className="text-xl font-bold text-primary">
+                    Part 3: 9.0
+                  </h4>
+                  <p className="text-sm text-muted-foreground">Discussion</p>
+                </div>
+              </div>
+              <div className="mt-6 space-y-2 rounded-lg bg-muted/50 p-4">
+                <h4 className="font-semibold">Key Performance Highlights:</h4>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-primary" />
+                    Speaks fluently with only rare repetition or self-correction
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-primary" />
+                    Uses a full range of pronunciation features with precision
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-primary" />
+                    Uses a wide range of complex structures with full
+                    flexibility
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>

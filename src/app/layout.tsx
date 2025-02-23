@@ -26,12 +26,21 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     siteName: 'Speakify IELTS',
+    images: [
+      {
+        url: '/images/main-page.png',
+        width: 1200,
+        height: 675,
+        alt: 'IELTS Speaking Practice Platform - Professional AI examiner interface',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Speakify IELTS - AI-Powered Speaking Test Examiner',
     description:
       'Practice IELTS speaking with our AI-powered exam examiner. Get instant feedback and improve your speaking skills.',
+    images: ['/images/main-page.png'],
   },
   robots: {
     index: true,
@@ -47,6 +56,39 @@ export const metadata: Metadata = {
   verification: {
     google: 'verification_token',
   },
+  icons: {
+    icon: [
+      {
+        url: '/favicon.ico',
+        sizes: '32x32',
+      },
+      {
+        url: '/favicon-16x16.png',
+        sizes: '16x16',
+        type: 'image/png',
+      },
+      {
+        url: '/favicon-32x32.png',
+        sizes: '32x32',
+        type: 'image/png',
+      },
+    ],
+    apple: [
+      {
+        url: '/apple-touch-icon.png',
+        sizes: '180x180',
+        type: 'image/png',
+      },
+    ],
+    other: [
+      {
+        rel: 'mask-icon',
+        url: '/safari-pinned-tab.svg',
+        color: '#5bbad5',
+      },
+    ],
+  },
+  manifest: '/site.webmanifest',
 };
 
 export default function RootLayout({
