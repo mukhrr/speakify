@@ -10,20 +10,48 @@ import {
   Timer,
   AlertCircle,
 } from 'lucide-react';
+import { Metadata } from 'next';
+
+// Enhanced metadata for the home page
+export const metadata: Metadata = {
+  title: 'Speakify IELTS - Practice IELTS Speaking with AI-Powered Examiner',
+  description:
+    'Master IELTS speaking with our AI-powered examiner. Get real-time feedback, practice with authentic questions, and improve your band score.',
+  openGraph: {
+    title: 'Speakify IELTS - Practice IELTS Speaking with AI Examiner',
+    description:
+      'Master IELTS speaking with our AI-powered examiner. Get real-time feedback and improve your band score.',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Speakify IELTS Speaking Practice',
+      },
+    ],
+  },
+};
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen">
+    <main className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-background to-muted/20 py-20">
+      <section
+        className="relative overflow-hidden bg-gradient-to-b from-background to-muted/20 py-20"
+        aria-labelledby="hero-heading"
+      >
         {/* Background Grid */}
-        <div className="bg-grid-white/[0.02] absolute inset-0 bg-[size:60px_60px]" />
+        <div
+          className="bg-grid-white/[0.02] absolute inset-0 bg-[size:60px_60px]"
+          aria-hidden="true"
+        />
 
         {/* Decorative Blobs */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          {/* Top-right blob */}
+        <div
+          className="pointer-events-none absolute inset-0 overflow-hidden"
+          aria-hidden="true"
+        >
           <div className="absolute -right-32 -top-32 h-[400px] w-[400px] rounded-full bg-primary/5 blur-3xl" />
-          {/* Bottom-left blob */}
           <div className="absolute -bottom-32 -left-32 h-[400px] w-[400px] rounded-full bg-primary/5 blur-3xl" />
         </div>
 
@@ -38,9 +66,15 @@ export default function HomePage() {
 
         <div className="container relative mx-auto max-w-5xl px-4 text-center">
           <Badge className="mb-4 rounded-full px-4 py-1.5" variant="secondary">
-            🎯 Real IELTS Speaking Test Simulation
+            <span role="img" aria-label="Target">
+              🎯
+            </span>{' '}
+            Real IELTS Speaking Test Simulation
           </Badge>
-          <h1 className="mb-6 text-4xl font-bold leading-tight tracking-tight sm:text-5xl md:text-6xl">
+          <h1
+            id="hero-heading"
+            className="mb-6 text-4xl font-bold leading-tight tracking-tight sm:text-5xl md:text-6xl"
+          >
             Feel the{' '}
             <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
               Authentic Pressure
@@ -48,10 +82,31 @@ export default function HomePage() {
             of IELTS Speaking
           </h1>
           <p className="mx-auto mb-8 max-w-2xl text-lg text-muted-foreground sm:text-xl">
-            Experience the intensity and time constraints of a real IELTS
-            speaking exam. Our AI examiner creates the same environment,
-            pressure, and format as your actual test day.
+            Practice IELTS speaking with our AI-powered examiner. Get instant
+            feedback on your pronunciation, fluency, and coherence. Experience a
+            real test environment with a professional examiner.
           </p>
+
+          {/* Add structured data for rich results */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': 'SoftwareApplication',
+                name: 'Speakify IELTS',
+                applicationCategory: 'EducationalApplication',
+                description:
+                  'AI-powered IELTS speaking practice with professional examiner feedback',
+                offers: {
+                  '@type': 'Offer',
+                  price: '0',
+                  priceCurrency: 'USD',
+                },
+                operatingSystem: 'Web',
+              }),
+            }}
+          />
           <div className="mb-12 grid gap-6 md:grid-cols-3">
             <div className="rounded-lg border bg-card/50 p-4 backdrop-blur">
               <div className="mb-2 flex items-center justify-center gap-2">
@@ -85,7 +140,7 @@ export default function HomePage() {
           <div className="mb-8 flex justify-center gap-4">
             <Link href="/auth/register">
               <Button size="lg" className="gap-2 font-semibold">
-                Try Free Demo <ArrowRight className="h-4 w-4" />
+                Try For Free <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
             <Link href="/auth/login">
@@ -133,8 +188,8 @@ export default function HomePage() {
             Experience the Real IELTS Format
           </h2>
           <p className="mb-12 text-center text-muted-foreground">
-            Our demo follows the exact structure and timing of the official
-            IELTS speaking test
+            Our exam follows the exact structure and timing of the official
+            IELTS speaking test, conducted by a professional AI examiner
           </p>
           <div className="grid gap-8 md:grid-cols-3">
             <div className="group relative rounded-lg border bg-card p-6 transition-all hover:shadow-lg">
@@ -259,13 +314,13 @@ export default function HomePage() {
             Ready for Your Mock IELTS Speaking Test?
           </h2>
           <p className="mb-8 text-lg text-muted-foreground">
-            Experience a complete IELTS speaking test in a realistic exam
-            environment.
+            Experience a complete IELTS speaking test with a professional AI
+            examiner in a realistic exam environment.
           </p>
           <div className="flex justify-center gap-4">
             <Link href="/auth/register">
               <Button size="lg" className="gap-2 font-semibold">
-                Start Free Demo <ArrowRight className="h-4 w-4" />
+                Start For Totally Free <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
             <Link href="/auth/login">
@@ -279,6 +334,6 @@ export default function HomePage() {
           </p>
         </div>
       </section>
-    </div>
+    </main>
   );
 }
