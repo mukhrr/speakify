@@ -43,6 +43,7 @@ export default function RegisterPage() {
     isAuthenticated,
   } = useAuth({
     redirectIfAuthenticated: true,
+    redirectTo: '/auth/register',
   });
   const [error, setError] = useState<string>('');
 

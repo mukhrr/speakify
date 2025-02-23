@@ -102,8 +102,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
-          'min-h-screen bg-background font-sans antialiased',
-          montserrat.className
+          'min-h-screen bg-background antialiased',
+          !montserrat.className
         )}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>

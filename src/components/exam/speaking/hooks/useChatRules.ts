@@ -51,7 +51,7 @@ export function useChatRules({
     const scores = extractScores(content);
     if (!scores) return;
 
-    const testId = sessionStorage.getItem('current-test-id');
+    const testId = localStorage.getItem('current-test-id');
     if (!testId) return;
 
     const partResult = {

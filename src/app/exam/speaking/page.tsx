@@ -16,7 +16,7 @@ export default function SpeakingExamRedirectPage() {
 
   useEffect(() => {
     // Check for existing test first
-    const existingTestId = sessionStorage.getItem('current-test-id');
+    const existingTestId = localStorage.getItem('current-test-id');
     if (existingTestId) {
       setExistingTest(existingTestId);
       return;
@@ -45,10 +45,10 @@ export default function SpeakingExamRedirectPage() {
   };
 
   const handleStartNew = async () => {
-    sessionStorage.removeItem('current-test-id');
+    localStorage.removeItem('current-test-id');
     try {
       const testId = await startNewTest();
-      sessionStorage.setItem('current-test-id', testId);
+      localStorage.setItem('current-test-id', testId);
       router.push(`/exam/speaking/${testId}`);
     } catch (error) {
       console.error('Failed to start new test:', error);

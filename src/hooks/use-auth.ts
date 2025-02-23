@@ -27,11 +27,11 @@ export function useAuth({
 
       // Store or remove user ID in session storage
       if (session?.user?.id) {
-        sessionStorage.setItem('user-id', session.user.id);
+        localStorage.setItem('user-id', session.user.id);
         setUserId(session.user.id);
       } else {
-        sessionStorage.removeItem('user-id');
-        sessionStorage.removeItem('current-test-id');
+        localStorage.removeItem('user-id');
+        localStorage.removeItem('current-test-id');
         setUserId(null);
       }
 

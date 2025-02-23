@@ -26,7 +26,7 @@ export default function SpeakingPartPage() {
   useEffect(() => {
     if (!isAuthenticated || !testId) return;
 
-    sessionStorage.setItem('current-test-id', testId);
+    localStorage.setItem('current-test-id', testId);
 
     // Validate part number
     if (![1, 2, 3].includes(partNumber)) {
@@ -87,7 +87,7 @@ export default function SpeakingPartPage() {
   const handlePartCompletion = () => {
     // Navigation based on part number
     if (partNumber === 3) {
-      sessionStorage.removeItem('current-test-id');
+      localStorage.removeItem('current-test-id');
       router.push('/dashboard/history');
     } else {
       router.push(`/exam/speaking/${testId}`);

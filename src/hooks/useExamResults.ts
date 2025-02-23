@@ -26,7 +26,7 @@ export function useExamResults(): UseExamResults {
   // Load current test from session storage
   const loadCurrentTest = useCallback(async () => {
     const testId =
-      sessionStorage.getItem('current-test-id') || (params?.testId as string);
+      localStorage.getItem('current-test-id') || (params?.testId as string);
     if (!testId || !isAuthenticated || !userId) return null;
 
     try {
@@ -74,7 +74,7 @@ export function useExamResults(): UseExamResults {
 
     try {
       const testId = await createNewTest(userId);
-      sessionStorage.setItem('current-test-id', testId);
+      localStorage.setItem('current-test-id', testId);
 
       const newTest = await getTestResult(userId, testId);
       setCurrentTest(newTest);

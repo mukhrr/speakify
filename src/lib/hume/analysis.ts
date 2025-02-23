@@ -36,7 +36,7 @@ export const calculateBandScore = (score: number): number => {
 // Store part result in session storage
 export const storeSpeakingPartResult = (result: SpeakingResult) => {
   const key = `speaking-part-${result.partNumber}`;
-  sessionStorage.setItem(key, JSON.stringify(result));
+  localStorage.setItem(key, JSON.stringify(result));
 };
 
 // Get all stored part results
@@ -44,7 +44,7 @@ export const getAllSpeakingResults = (): SpeakingResult[] => {
   const results: SpeakingResult[] = [];
   for (let i = 1; i <= 3; i++) {
     const key = `speaking-part-${i}`;
-    const stored = sessionStorage.getItem(key);
+    const stored = localStorage.getItem(key);
     if (stored) {
       results.push(JSON.parse(stored));
     }
@@ -55,7 +55,7 @@ export const getAllSpeakingResults = (): SpeakingResult[] => {
 // Clear all stored results
 export const clearSpeakingResults = () => {
   for (let i = 1; i <= 3; i++) {
-    sessionStorage.removeItem(`speaking-part-${i}`);
+    localStorage.removeItem(`speaking-part-${i}`);
   }
 };
 

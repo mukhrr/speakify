@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Metadata } from 'next';
 import { FeedbackImage } from '@/components/feedback-image';
+import { UpcomingModules } from '@/components/upcoming-modules';
 
 // Enhanced metadata for the home page
 export const metadata: Metadata = {
@@ -256,30 +257,6 @@ export default function HomePage() {
               <div className="aspect-[16/10] overflow-hidden rounded-lg">
                 <FeedbackImage />
               </div>
-              <div className="mt-6 grid gap-4 px-2 text-center sm:grid-cols-3">
-                <div>
-                  <h4 className="text-xl font-bold text-primary">
-                    Part 1: 9.0
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    Introduction & Interview
-                  </p>
-                </div>
-                <div>
-                  <h4 className="text-xl font-bold text-primary">
-                    Part 2: 9.0
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    Long Turn Speech
-                  </p>
-                </div>
-                <div>
-                  <h4 className="text-xl font-bold text-primary">
-                    Part 3: 9.0
-                  </h4>
-                  <p className="text-sm text-muted-foreground">Discussion</p>
-                </div>
-              </div>
               <div className="mt-6 space-y-2 rounded-lg bg-muted/50 p-4">
                 <h4 className="font-semibold">Key Performance Highlights:</h4>
                 <ul className="space-y-2 text-sm text-muted-foreground">
@@ -409,6 +386,9 @@ export default function HomePage() {
           </p>
         </div>
       </section>
+
+      {/* Upcoming Modules Section */}
+      <UpcomingModules />
     </main>
   );
 }

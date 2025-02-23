@@ -50,7 +50,7 @@ export default function Controls({
   const handleEndCall = () => {
     const confirmMessage = `Are you sure you want to end the speaking test? This will not complete current part. You will have to re-take the test!`;
     const confirmed = window.confirm(confirmMessage);
-    const sessionId = sessionStorage.getItem('current-test-id');
+    const sessionId = localStorage.getItem('current-test-id');
 
     if (confirmed) {
       disconnectMic();

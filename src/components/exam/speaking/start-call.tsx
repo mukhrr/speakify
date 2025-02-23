@@ -22,7 +22,7 @@ export default function StartCall({ partNumber }: StartCallProps) {
 
   useEffect(() => {
     // Check if this part is already completed
-    const result = sessionStorage.getItem(`speaking-part-${partNumber}`);
+    const result = localStorage.getItem(`speaking-part-${partNumber}`);
     setIsPartCompleted(!!result);
   }, [partNumber]);
 

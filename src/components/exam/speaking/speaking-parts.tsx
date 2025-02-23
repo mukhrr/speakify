@@ -44,7 +44,7 @@ const PARTS: Part[] = [
 
 export function SpeakingParts({ accessToken, partId }: SpeakingPartsProps) {
   const router = useRouter();
-  const testId = sessionStorage.getItem('current-test-id');
+  const testId = localStorage.getItem('current-test-id');
   const { currentTest, isLoading } = useExamResults();
   const [activePart, setActivePart] = useState<Part | null>(() => {
     if (partId) {
