@@ -31,7 +31,7 @@ export function useVoiceControl({
 
   // Handle scoring and call completion
   useEffect(() => {
-    if (messages?.length > 0) {
+    if (messages?.length > 0 && partNumber === 2) {
       const lastMessage = messages[messages.length - 1];
 
       // Check for scoring message to show loading state
@@ -39,9 +39,14 @@ export function useVoiceControl({
         lastMessage.type === 'assistant_message' &&
         typeof lastMessage.message?.content === 'string'
       ) {
-        if (lastMessage.message.content.toLowerCase().includes('overall')) {
+        if (
+          lastMessage.message.content
+            .toLowerCase()
+            .includes('you can make notes if you wish')
+        ) {
           muteAudio();
-          setIsScoring(true);
+          // TODO: make true when we have the scoring logic
+          setIsScoring(false);
         }
       }
 
