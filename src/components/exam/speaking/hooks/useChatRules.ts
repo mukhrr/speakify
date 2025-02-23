@@ -21,10 +21,10 @@ export function useChatRules({
 
   const configId =
     partNumber === 1
-      ? process.env.NEXT_PUBLIC_HUME_CONFIG_ID_1
+      ? process.env.HUME_CONFIG_ID_1
       : partNumber === 2
-        ? process.env.NEXT_PUBLIC_HUME_CONFIG_ID_2
-        : process.env.NEXT_PUBLIC_HUME_CONFIG_ID_3;
+        ? process.env.HUME_CONFIG_ID_2
+        : process.env.HUME_CONFIG_ID_3;
 
   const extractScores = (content: string) => {
     const scores = {

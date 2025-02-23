@@ -15,7 +15,7 @@ export function formatDate(input: string | number): string {
 }
 
 export function absoluteUrl(path: string) {
-  return `${process.env.NEXT_PUBLIC_APP_URL}${path}`;
+  return `${process.env.NEXT_PROJECT_API_URL}${path}`;
 }
 
 export function delay(ms: number) {

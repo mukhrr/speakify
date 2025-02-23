@@ -59,8 +59,8 @@ export default function SpeakingPartPage() {
     const initialize = async () => {
       try {
         const token = await fetchAccessToken({
-          apiKey: process.env.NEXT_PUBLIC_HUME_API_KEY!,
-          secretKey: process.env.NEXT_PUBLIC_HUME_SECRET_KEY!,
+          apiKey: process.env.HUME_API_KEY!,
+          secretKey: process.env.HUME_SECRET_KEY!,
         });
         setAccessToken(token);
       } catch (error) {

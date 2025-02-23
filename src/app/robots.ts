@@ -13,6 +13,6 @@ export default function robots(): MetadataRoute.Robots {
         '/checkout/',
       ],
     },
-    sitemap: `${process.env.NEXT_PUBLIC_APP_URL}/sitemap.xml`,
+    sitemap: `${process.env.NEXT_PROJECT_API_URL}/sitemap.xml`,
   };
 }
