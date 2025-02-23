@@ -4,10 +4,9 @@ import { cn } from '@/utils';
 
 interface TimerProps {
   timeLeft: number;
-  isPreparationTime: boolean;
 }
 
-export function Timer({ timeLeft, isPreparationTime }: TimerProps) {
+export function Timer({ timeLeft }: TimerProps) {
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
 
@@ -23,9 +22,6 @@ export function Timer({ timeLeft, isPreparationTime }: TimerProps) {
           : 'border-border bg-background text-foreground'
       )}
     >
-      <span className="mr-2 text-muted-foreground">
-        {isPreparationTime ? 'Preparation' : 'Speaking'}:
-      </span>
       <span className={cn(isLowTime && 'text-red-700')}>{formattedTime}</span>
     </div>
   );

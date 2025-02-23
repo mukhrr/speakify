@@ -1,18 +1,23 @@
 'use client';
 
-import { Mic, MicOff, Phone, Volume2, VolumeX } from 'lucide-react';
+import { Loader2, Mic, MicOff, Phone } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { Toggle } from '@/components/ui/toggle';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { Timer } from './timer';
 import MicFFT from './mic-fft';
-import { cn } from '@/utils';
+
 import { useMicControl } from './hooks/useMicControl';
 import { useVoiceControl } from './hooks/useVoiceControl';
 import { useExamTimer } from './hooks/useExamTimer';
-import { Timer } from './timer';
-import { Loader2 } from 'lucide-react';
 
 interface ControlsProps {
   partNumber: 1 | 2 | 3;
@@ -31,12 +36,7 @@ export default function Controls({
     micFft,
   } = useMicControl();
 
-  const {
-    isScoring,
-    isAudioMuted,
-    handleVoiceToggle,
-    disconnect: disconnectVoice,
-  } = useVoiceControl({
+  const { isScoring, disconnect: disconnectVoice } = useVoiceControl({
     partNumber,
     onCompleteAction,
   });
@@ -49,7 +49,6 @@ export default function Controls({
 
   const handleEndCall = () => {
     const confirmMessage = `Are you sure you want to end the speaking test? This will not complete current part. You will have to re-take the test!`;
-
     const confirmed = window.confirm(confirmMessage);
     const sessionId = sessionStorage.getItem('current-test-id');
 
@@ -57,36 +56,19 @@ export default function Controls({
       disconnectMic();
       disconnectVoice();
       onCompleteAction(partNumber);
-
       router.push(`/exam/speaking/${sessionId}`);
     }
   };
 
   return (
-    <div
-      className={cn(
-        'fixed bottom-0 left-0 flex w-full items-center justify-center p-4',
-        'bg-gradient-to-t from-card via-card/90 to-card/0'
-      )}
-    >
+    <div className="fixed inset-x-0 bottom-0 bg-gradient-to-t from-background/80 to-background/0 pb-4 pt-16">
       <AnimatePresence>
         {status.value === 'connected' ? (
           <motion.div
-            initial={{
-              y: '100%',
-              opacity: 0,
-            }}
-            animate={{
-              y: 0,
-              opacity: 1,
-            }}
-            exit={{
-              y: '100%',
-              opacity: 0,
-            }}
-            className={
-              'flex items-center gap-4 rounded-lg border border-border bg-card p-4 shadow-sm'
-            }
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 20, opacity: 0 }}
+            className="mx-auto flex max-w-3xl items-center justify-between rounded-lg border bg-card px-4 py-2 shadow-lg"
           >
             {isScoring ? (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -94,46 +76,68 @@ export default function Controls({
                 <span>Calculating score...</span>
               </div>
             ) : (
-              <>
-                {partNumber === 2 && isRunning && (
-                  <Timer
-                    timeLeft={timeLeft}
-                    isPreparationTime={isPreparationTime}
-                  />
-                )}
+              <TooltipProvider>
+                <>
+                  {/* Left Section: Timer */}
+                  <div className="flex items-center gap-2">
+                    {partNumber === 2 && isRunning && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">
+                          {isPreparationTime ? 'Preparation:' : 'Speaking:'}
+                        </span>
+                        <Timer timeLeft={timeLeft} />
+                      </div>
+                    )}
+                  </div>
 
-                <Toggle pressed={!isMuted} onPressedChange={handleMuteToggle}>
-                  {isMuted ? (
-                    <MicOff className={'size-4'} />
-                  ) : (
-                    <Mic className={'size-4'} />
-                  )}
-                </Toggle>
+                  {/* Center Section: Controls */}
+                  <div className="flex items-center gap-8">
+                    <div className="flex items-center gap-6">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Toggle
+                            pressed={!isMuted}
+                            onPressedChange={handleMuteToggle}
+                            className="h-10 w-10 data-[state=on]:bg-green-500/20 data-[state=on]:text-green-500"
+                          >
+                            {isMuted ? (
+                              <MicOff className="h-5 w-5" />
+                            ) : (
+                              <Mic className="h-5 w-5" />
+                            )}
+                          </Toggle>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>
+                            {isMuted ? 'Unmute microphone' : 'Mute microphone'}
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
 
-                <Toggle
-                  pressed={!isAudioMuted}
-                  onPressedChange={handleVoiceToggle}
-                >
-                  {isAudioMuted ? (
-                    <VolumeX className={'size-4'} />
-                  ) : (
-                    <Volume2 className={'size-4'} />
-                  )}
-                </Toggle>
+                    <div className="h-8 w-48">
+                      <MicFFT fft={micFft} className="fill-current" />
+                    </div>
+                  </div>
 
-                <div className={'relative grid h-8 w-48 shrink grow-0'}>
-                  <MicFFT fft={micFft} className={'fill-current'} />
-                </div>
-
-                <Button
-                  className={'flex items-center gap-1.5'}
-                  onClick={handleEndCall}
-                  variant={'destructive'}
-                >
-                  <Phone className={'size-4 opacity-50'} strokeWidth={2} />
-                  <span>End Test</span>
-                </Button>
-              </>
+                  {/* Right Section: End Call */}
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        onClick={handleEndCall}
+                        variant="destructive"
+                        size="sm"
+                        className="h-8 gap-1.5 rounded-xl px-4"
+                      >
+                        <Phone className="h-4 w-4" strokeWidth={2} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>End the current speaking test</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </>
+              </TooltipProvider>
             )}
           </motion.div>
         ) : null}
