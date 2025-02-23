@@ -50,7 +50,7 @@ export const initializeEVI = async () => {
     throw new Error('Failed to get Hume access token');
   }
 
-  const configId = process.env.NEXT_PUBLIC_HUME_CONFIG_ID;
+  const configId = process.env.HUME_CONFIG_ID;
   const wsUrl = `wss://api.hume.ai/v0/stream/models?config_id=${configId}`;
 
   ws = new WebSocket(wsUrl);

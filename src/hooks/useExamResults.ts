@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from './use-auth';
 import {
   TestResult,
@@ -24,7 +24,7 @@ export function useExamResults(): UseExamResults {
   const params = useParams();
 
   // Load current test from session storage
-  const loadCurrentTest = async () => {
+  const loadCurrentTest = useCallback(async () => {
     const testId =
       sessionStorage.getItem('current-test-id') || (params?.testId as string);
     if (!testId || !isAuthenticated || !userId) return null;
@@ -36,10 +36,10 @@ export function useExamResults(): UseExamResults {
       console.error('Error loading current test:', error);
       return null;
     }
-  };
+  }, [isAuthenticated, userId, params]);
 
   // Load test history
-  const loadTestHistory = async () => {
+  const loadTestHistory = useCallback(async () => {
     if (!isAuthenticated || !userId) return [];
 
     try {
@@ -49,10 +49,10 @@ export function useExamResults(): UseExamResults {
       console.error('Error loading test history:', error);
       return [];
     }
-  };
+  }, [isAuthenticated, userId]);
 
   // Refresh all results
-  const refreshResults = async () => {
+  const refreshResults = useCallback(async () => {
     setIsLoading(true);
     try {
       const [test, history] = await Promise.all([
@@ -66,7 +66,7 @@ export function useExamResults(): UseExamResults {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [loadCurrentTest, loadTestHistory]);
 
   // Start a new test
   const startNewTest = async () => {
@@ -91,7 +91,7 @@ export function useExamResults(): UseExamResults {
     if (isAuthenticated && userId) {
       refreshResults();
     }
-  }, [isAuthenticated, userId]);
+  }, [isAuthenticated, userId, refreshResults]);
 
   return {
     currentTest,

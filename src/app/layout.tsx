@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Montserrat } from 'next/font/google';
+import { Suspense } from 'react';
+import { cn } from '@/lib/utils';
 
 import './globals.css';
 
@@ -8,7 +10,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { MainNav } from '@/components/nav';
 import { AuthHandler } from '@/components/auth/auth-handler';
 
-const inter = Inter({ subsets: ['latin'] });
+const montserrat = Montserrat({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Speakify IELTS - AI-Powered Speaking Test Examiner',
@@ -98,14 +100,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem={false}
-          storageKey="speakify-theme"
-        >
-          <AuthHandler />
+      <body
+        className={cn(
+          'min-h-screen bg-background font-sans antialiased',
+          montserrat.className
+        )}
+      >
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <Suspense>
+            <AuthHandler />
+          </Suspense>
           <MainNav />
           {children}
           <Toaster />
