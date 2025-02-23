@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Moon, Sun } from 'lucide-react';
+import { Moon, Sun, MessageCircle } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { supabase } from '@/lib/supabase/client';
 import { User as SupabaseUser } from '@supabase/supabase-js';
@@ -102,6 +102,17 @@ export function MainNav() {
           )}
         </div>
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+          <a
+            href="https://t.me/ieltsgurus_support_bot"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mr-2"
+          >
+            <Button variant="ghost" size="sm" className="gap-2">
+              <MessageCircle className="h-4 w-4" />
+              Support
+            </Button>
+          </a>
           {user ? (
             <div className="flex items-center gap-2">
               <DropdownMenu>
