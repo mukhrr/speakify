@@ -31,7 +31,6 @@ export function useAuth({
         setUserId(session.user.id);
       } else {
         localStorage.removeItem('user-id');
-        localStorage.removeItem('current-test-id');
         setUserId(null);
       }
 
