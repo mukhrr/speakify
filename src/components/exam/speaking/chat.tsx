@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { VoiceProvider } from '@humeai/voice-react';
 import { useChatRules } from './hooks/useChatRules';
 import { Switch } from '@/components/ui/switch';
@@ -21,14 +21,10 @@ export default function Chat({
   partNumber,
   onCompleteAction,
 }: ChatProps) {
-  const messagesRef = useRef<HTMLDivElement>(
-    null
-  ) as React.RefObject<HTMLDivElement>;
   const [showMessages, setShowMessages] = useState(true);
   const { configId, handleMessage } = useChatRules({
     partNumber,
     onCompleteAction,
-    messagesRef,
   });
 
   // Force messages to be visible in Part 2
@@ -60,9 +56,7 @@ export default function Chat({
             </Label>
           </div>
         )}
-        {isMessagesVisible && (
-          <Messages ref={messagesRef} partNumber={partNumber} />
-        )}
+        {isMessagesVisible && <Messages partNumber={partNumber} />}
         <Controls partNumber={partNumber} onCompleteAction={onCompleteAction} />
         <StartCall partNumber={partNumber} />
       </VoiceProvider>

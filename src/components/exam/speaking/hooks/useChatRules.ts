@@ -1,4 +1,3 @@
-import { useRef } from 'react';
 import { JSONMessage } from '@humeai/voice-react';
 import { savePartResult } from '@/lib/supabase/speaking-results';
 import { useAuth } from '@/hooks/use-auth';
@@ -7,7 +6,6 @@ import { generateFeedback } from '@/lib/hume/analysis';
 interface UseChatRulesProps {
   partNumber: 1 | 2 | 3;
   onCompleteAction: (partId: number) => void;
-  messagesRef: React.RefObject<HTMLDivElement>;
 }
 
 interface ChatRules {
@@ -18,9 +16,7 @@ interface ChatRules {
 export function useChatRules({
   partNumber,
   onCompleteAction,
-  messagesRef,
 }: UseChatRulesProps): ChatRules {
-  const timeout = useRef<number | null>(null);
   const { userId } = useAuth();
 
   const configId =
@@ -29,22 +25,6 @@ export function useChatRules({
       : partNumber === 2
         ? process.env.NEXT_PUBLIC_HUME_CONFIG_ID_2
         : process.env.NEXT_PUBLIC_HUME_CONFIG_ID_3;
-
-  const onMessage = () => {
-    if (timeout.current) {
-      window.clearTimeout(timeout.current);
-    }
-
-    timeout.current = window.setTimeout(() => {
-      if (messagesRef.current) {
-        const scrollHeight = messagesRef.current.scrollHeight;
-        messagesRef.current.scrollTo({
-          top: scrollHeight,
-          behavior: 'smooth',
-        });
-      }
-    }, 200);
-  };
 
   const extractScores = (content: string) => {
     const scores = {
@@ -62,16 +42,12 @@ export function useChatRules({
     }
 
     scores.overall = parseFloat(overallMatch[1]);
-
-    console.log('scores', scores);
-
     return scores;
   };
 
   const handlePartCompletion = async (content: string) => {
     if (!userId) return;
 
-    console.log('content', content);
     const scores = extractScores(content);
     if (!scores) return;
 
@@ -105,8 +81,6 @@ export function useChatRules({
         handlePartCompletion(content);
       }
     }
-
-    onMessage();
   };
 
   return {

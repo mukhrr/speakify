@@ -1,29 +1,39 @@
 'use client';
 
-import { Ref } from 'react';
+import { useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { cn } from '@/utils';
 import { useQuestionMessages } from '@/hooks/useQuestionMessages';
 import { AssistantMessage } from 'hume/api/resources/empathicVoice/types/AssistantMessage';
+
 interface MessagesProps {
-  ref?: Ref<HTMLDivElement>;
   partNumber: 1 | 2 | 3;
 }
 
-const Messages = ({ ref, partNumber }: MessagesProps) => {
+const Messages = ({ partNumber }: MessagesProps) => {
+  const messagesRef = useRef<HTMLDivElement>(null);
   const questionMessages: AssistantMessage[] = useQuestionMessages(partNumber);
+
+  // Auto-scroll when new messages arrive
+  useEffect(() => {
+    if (messagesRef.current) {
+      const scrollContainer = messagesRef.current;
+      scrollContainer.scrollTo({
+        top: scrollContainer.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  }, [questionMessages]);
 
   return (
     <motion.div
       layoutScroll
-      className={'grow overflow-auto rounded-md p-4'}
-      ref={ref}
+      className="grow overflow-auto scroll-smooth rounded-md p-4"
+      ref={messagesRef}
     >
-      <motion.div
-        className={'mx-auto flex w-full max-w-2xl flex-col gap-4 pb-24'}
-      >
-        <AnimatePresence mode={'popLayout'}>
+      <motion.div className="mx-auto flex w-full max-w-2xl flex-col gap-4 pb-24">
+        <AnimatePresence mode="popLayout">
           {questionMessages.map((msg, index) => (
             <motion.div
               key={msg.type + index}
@@ -52,7 +62,7 @@ const Messages = ({ ref, partNumber }: MessagesProps) => {
               >
                 Examiner
               </div>
-              <div className={'px-3 pb-3'}>{msg.message?.content}</div>
+              <div className="px-3 pb-3">{msg.message?.content}</div>
             </motion.div>
           ))}
         </AnimatePresence>
