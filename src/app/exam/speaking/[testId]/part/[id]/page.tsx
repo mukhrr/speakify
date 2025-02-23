@@ -18,7 +18,8 @@ export default function SpeakingPartPage() {
   const testId = params?.testId as string;
   const partNumber = parseInt(id) as 1 | 2 | 3;
 
-  const { part1Completed, part2Completed } = useExamPartsStatus();
+  const { part1Completed, part2Completed, part3Completed } =
+    useExamPartsStatus();
   const { isLoading: authLoading, isAuthenticated } = useAuth();
   const { currentTest } = useExamResults();
 
@@ -33,13 +34,23 @@ export default function SpeakingPartPage() {
       return;
     }
 
-    // Check if previous parts are completed
-    if (partNumber === 2 && !part1Completed && !loading) {
+    // If part 1 is completed, redirect to speaking page
+    if (partNumber === 1 && part1Completed && !loading) {
       router.push(`/exam/speaking/${testId}`);
       return;
     }
 
-    if (partNumber === 3 && (!part1Completed || !part2Completed) && !loading) {
+    // Check if previous parts are completed
+    if (partNumber === 2 && (!part1Completed || part2Completed) && !loading) {
+      router.push(`/exam/speaking/${testId}`);
+      return;
+    }
+
+    if (
+      partNumber === 3 &&
+      (!part1Completed || !part2Completed || part3Completed) &&
+      !loading
+    ) {
       router.push(`/exam/speaking/${testId}`);
       return;
     }
@@ -66,9 +77,11 @@ export default function SpeakingPartPage() {
     router,
     part1Completed,
     part2Completed,
+    part3Completed,
     isAuthenticated,
     currentTest,
     testId,
+    loading,
   ]);
 
   const handlePartCompletion = () => {

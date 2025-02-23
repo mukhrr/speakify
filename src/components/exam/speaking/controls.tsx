@@ -1,6 +1,6 @@
 'use client';
 
-import { Mic, MicOff, Phone, ArrowRight, Volume2, VolumeX } from 'lucide-react';
+import { Mic, MicOff, Phone, Volume2, VolumeX } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 
@@ -48,25 +48,17 @@ export default function Controls({
   const router = useRouter();
 
   const handleEndCall = () => {
-    const isLastPart = partNumber === 3;
-    const confirmMessage = isLastPart
-      ? 'Are you sure you want to end the speaking test? This will complete Part 3.'
-      : `Are you sure you want to end Part ${partNumber}? You will proceed to Part ${partNumber + 1}.`;
+    const confirmMessage = `Are you sure you want to end the speaking test? This will not complete current part. You will have to re-take the test!`;
 
     const confirmed = window.confirm(confirmMessage);
+    const sessionId = sessionStorage.getItem('current-test-id');
 
     if (confirmed) {
       disconnectMic();
       disconnectVoice();
       onCompleteAction(partNumber);
 
-      // Navigate to results page if it's the last part, otherwise go back to overview
-      if (isLastPart) {
-        sessionStorage.removeItem('current-test-id');
-        router.push('/exam/speaking/results');
-      } else {
-        router.push('/exam/speaking');
-      }
+      router.push(`/exam/speaking/${sessionId}`);
     }
   };
 
@@ -136,23 +128,10 @@ export default function Controls({
                 <Button
                   className={'flex items-center gap-1.5'}
                   onClick={handleEndCall}
-                  variant={partNumber === 3 ? 'destructive' : 'default'}
+                  variant={'destructive'}
                 >
-                  <span>
-                    {partNumber === 3 ? (
-                      <Phone className={'size-4 opacity-50'} strokeWidth={2} />
-                    ) : (
-                      <ArrowRight
-                        className={'size-4 opacity-50'}
-                        strokeWidth={2}
-                      />
-                    )}
-                  </span>
-                  <span>
-                    {partNumber === 3
-                      ? 'End Speaking Test'
-                      : 'I am Done, Next Section'}
-                  </span>
+                  <Phone className={'size-4 opacity-50'} strokeWidth={2} />
+                  <span>End Test</span>
                 </Button>
               </>
             )}

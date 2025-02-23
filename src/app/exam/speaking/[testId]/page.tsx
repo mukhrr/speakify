@@ -59,7 +59,7 @@ export default function SpeakingExamPage() {
             </div>
             {part1Completed ? (
               <div className="flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1 text-sm font-medium text-primary">
-                <CheckCircle2 className="size-4" />
+                <CheckCircle2 className="size-4 text-emerald-600" />
                 <span>Completed</span>
               </div>
             ) : (
@@ -86,7 +86,7 @@ export default function SpeakingExamPage() {
             </div>
             {part2Completed ? (
               <div className="flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1 text-sm font-medium text-primary">
-                <CheckCircle2 className="size-4" />
+                <CheckCircle2 className="size-4 text-emerald-600" />
                 <span>Completed</span>
               </div>
             ) : part1Completed ? (
@@ -118,7 +118,7 @@ export default function SpeakingExamPage() {
             </div>
             {part3Completed ? (
               <div className="flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1 text-sm font-medium text-primary">
-                <CheckCircle2 className="size-4" />
+                <CheckCircle2 className="size-4 text-emerald-600" />
                 <span>Completed</span>
               </div>
             ) : part1Completed && part2Completed ? (
