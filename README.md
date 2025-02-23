@@ -1,4 +1,4 @@
-# Speakify - IELTS Mock Exam Simulator
+# ieltstify - IELTS Mock Exam Simulator
 
 A modern IELTS exam simulation platform built with Next.js, TypeScript, and AI-powered speaking assessment.
 
@@ -38,8 +38,8 @@ A modern IELTS exam simulation platform built with Next.js, TypeScript, and AI-p
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/speakify.git
-   cd speakify
+   git clone https://github.com/yourusername/ieltstify.git
+   cd ieltstify
    ```
 
 2. Install dependencies:

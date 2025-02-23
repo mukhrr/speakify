@@ -13,21 +13,21 @@ import { AuthHandler } from '@/components/auth/auth-handler';
 const montserrat = Montserrat({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Speakify IELTS - AI-Powered Speaking Test Examiner',
+  title: 'ieltstify - AI-Powered Speaking Test Examiner',
   description:
     'Practice IELTS speaking with our AI-powered exam examiner. Get instant feedback, realistic questions, and improve your speaking skills with advanced speech analysis.',
   keywords:
     'IELTS speaking, IELTS practice, speaking test examiner, AI language assessment, IELTS preparation, English speaking practice',
-  authors: [{ name: 'Speakify IELTS Team' }],
-  creator: 'Speakify IELTS',
-  publisher: 'Speakify IELTS',
+  authors: [{ name: 'ieltstify Team' }],
+  creator: 'ieltstify team',
+  publisher: 'ieltstify team',
   openGraph: {
-    title: 'Speakify IELTS - AI-Powered Speaking Test Examiner',
+    title: 'ieltstify - AI-Powered Speaking Test Examiner',
     description:
       'Practice IELTS speaking with our AI-powered exam examiner. Get instant feedback, realistic questions, and improve your speaking skills.',
     type: 'website',
     locale: 'en_US',
-    siteName: 'Speakify IELTS',
+    siteName: 'ieltstify',
     images: [
       {
         url: '/images/main-page.png',
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Speakify IELTS - AI-Powered Speaking Test Examiner',
+    title: 'ieltstify - AI-Powered Speaking Test Examiner',
     description:
       'Practice IELTS speaking with our AI-powered exam examiner. Get instant feedback and improve your speaking skills.',
     images: ['/images/main-page.png'],

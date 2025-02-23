@@ -1,6 +1,6 @@
 {
-  "name": "Speakify IELTS",
-  "short_name": "Speakify",
+  "name": "ieltstify",
+  "short_name": "ieltstify",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",

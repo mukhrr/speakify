@@ -25,7 +25,7 @@ export default function DashboardPage() {
 
   return (
     <div className="container mx-auto max-w-4xl py-8">
-      <h1 className="mb-4 text-3xl font-bold">Welcome to Speakify</h1>
+      <h1 className="mb-4 text-3xl font-bold">Welcome to IELTSTIFY</h1>
       <p className="mb-8 text-muted-foreground">
         Practice your IELTS speaking skills with our AI-powered simulator.
       </p>

@@ -90,7 +90,7 @@ export default function RegisterPage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold">Create an account</h1>
           <p className="mt-2 text-sm text-gray-600">
-            Join Speakify IELTS Simulator today
+            Join IELTSTIFY today
           </p>
         </div>
 

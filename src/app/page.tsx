@@ -16,11 +16,11 @@ import { UpcomingModules } from '@/components/upcoming-modules';
 
 // Enhanced metadata for the home page
 export const metadata: Metadata = {
-  title: 'Speakify IELTS - Practice IELTS Speaking with AI-Powered Examiner',
+  title: 'ieltstify - Practice IELTS Speaking with AI-Powered Examiner',
   description:
     'Master IELTS speaking with our AI-powered examiner. Get real-time feedback, practice with authentic questions, and improve your band score.',
   openGraph: {
-    title: 'Speakify IELTS - Practice IELTS Speaking with AI Examiner',
+    title: 'ieltstify - Practice IELTS Speaking with AI Examiner',
     description:
       'Master IELTS speaking with our AI-powered examiner. Get real-time feedback and improve your band score.',
     images: [
@@ -32,11 +32,11 @@ export const metadata: Metadata = {
       },
     ],
     type: 'website',
-    siteName: 'Speakify IELTS',
+    siteName: 'ieltstify',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Speakify IELTS - Practice IELTS Speaking with AI Examiner',
+    title: 'ieltstify - Practice IELTS Speaking with AI Examiner',
     description:
       'Master IELTS speaking with our AI-powered examiner. Get real-time feedback and improve your band score.',
     images: ['/images/main-page.png'],
@@ -105,7 +105,7 @@ export default function HomePage() {
               __html: JSON.stringify({
                 '@context': 'https://schema.org',
                 '@type': 'SoftwareApplication',
-                name: 'Speakify IELTS',
+                name: 'ieltstify',
                 applicationCategory: 'EducationalApplication',
                 description:
                   'AI-powered IELTS speaking practice with professional examiner feedback',
