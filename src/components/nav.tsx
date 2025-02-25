@@ -28,6 +28,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { FeedbackModal } from '@/components/feedback-modal';
 
 export function MainNav() {
   const pathname = usePathname();
@@ -113,6 +114,7 @@ export function MainNav() {
               Support
             </Button>
           </a>
+          <FeedbackModal />
           {user ? (
             <div className="flex items-center gap-2">
               <DropdownMenu>
