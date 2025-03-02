@@ -50,7 +50,7 @@ export function useMicControl({
     }
   }, [isMuted, unmute, mute]);
 
-  // Split the effect into two separate effects for better control
+  // Automatically mute/unmute mic based on AI speaking status
   useEffect(() => {
     if (!status?.value || typeof status.value !== 'string') return;
 
@@ -61,6 +61,7 @@ export function useMicControl({
     }
   }, [isPlaying, status?.value, mute, unmute, partNumber]);
 
+  // Automatically mute/unmute mic based on AI speaking status
   useEffect(() => {
     const lastMessage = messages[messages.length - 1] as TMessage | undefined;
     if (
