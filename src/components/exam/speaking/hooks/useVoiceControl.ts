@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useCallback, useMemo } from 'react';
 import { useVoice } from '@humeai/voice-react';
 
 interface UseVoiceControlProps {
@@ -7,65 +7,53 @@ interface UseVoiceControlProps {
 }
 
 interface VoiceControl {
-  isScoring: boolean;
   isAudioMuted: boolean;
   handleVoiceToggle: () => void;
   disconnect: () => void;
 }
+
+export type TMessage = {
+  type: string;
+  message?: {
+    content?: string;
+  };
+  name?: string;
+};
 
 export function useVoiceControl({
   partNumber,
   onCompleteAction,
 }: UseVoiceControlProps): VoiceControl {
   const voice = useVoice();
-  const [isScoring, setIsScoring] = useState(false);
-  const { messages, muteAudio, unmuteAudio, isAudioMuted, disconnect } = voice;
+  const { messages, muteAudio, mute, unmuteAudio, isAudioMuted, disconnect } =
+    voice;
 
-  const handleVoiceToggle = () => {
+  const handleVoiceToggle = useCallback(() => {
     if (isAudioMuted) {
       unmuteAudio();
     } else {
       muteAudio();
     }
-  };
+  }, [isAudioMuted, muteAudio, unmuteAudio]);
 
-  // Handle scoring and call completion
   useEffect(() => {
-    if (messages?.length > 0 && partNumber === 2) {
-      const lastMessage = messages[messages.length - 1];
+    if (!messages?.length || partNumber !== 2) return;
 
-      // Check for scoring message to show loading state
-      if (
-        lastMessage.type === 'assistant_message' &&
-        typeof lastMessage.message?.content === 'string'
-      ) {
-        if (
-          lastMessage.message.content
-            .toLowerCase()
-            .includes('you can make notes if you wish')
-        ) {
-          muteAudio();
-          // TODO: make true when we have the scoring logic
-          setIsScoring(false);
-        }
-      }
+    const lastMessage = messages[messages.length - 1] as TMessage;
 
-      // @ts-expect-error message name is not typed
-      if (lastMessage.name === 'hang_up') onCompleteAction(partNumber);
+    if (lastMessage.name === 'hang_up') {
+      onCompleteAction(partNumber);
     }
-  }, [
-    messages,
-    muteAudio,
-    unmuteAudio,
-    disconnect,
-    onCompleteAction,
-    partNumber,
-  ]);
+  }, [messages, mute, onCompleteAction, partNumber]);
 
-  return {
-    isScoring,
-    isAudioMuted,
-    handleVoiceToggle,
-    disconnect,
-  };
+  const controls = useMemo(
+    () => ({
+      isAudioMuted,
+      handleVoiceToggle,
+      disconnect,
+    }),
+    [isAudioMuted, handleVoiceToggle, disconnect]
+  );
+
+  return controls;
 }

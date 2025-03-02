@@ -1,39 +1,85 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback, useMemo } from 'react';
 import { useVoice } from '@humeai/voice-react';
+import { TMessage } from './useVoiceControl';
+
+type VoiceStatusValue = 'connected' | 'disconnected' | 'connecting' | 'error';
+
+interface VoiceStatus {
+  value: VoiceStatusValue;
+}
 
 interface MicControl {
   isMuted: boolean;
-  status: {
-    value: string;
-  };
+  status: VoiceStatus;
   micFft: number[];
   handleMuteToggle: () => void;
   disconnect: () => void;
 }
 
-export function useMicControl(): MicControl {
-  const voice = useVoice();
-  const { status, isMuted, unmute, mute, micFft, disconnect } = voice;
+const UNMUTE_TRIGGER_PHRASE = 'please begin speaking';
 
-  const handleMuteToggle = () => {
-    if (isMuted) unmute();
-    else mute();
-  };
-
-  // Automatically mute/unmute mic based on AI speaking status
-  useEffect(() => {
-    if (voice.isPlaying) {
-      voice.mute();
-    } else if (voice.status.value === 'connected') {
-      voice.unmute();
-    }
-  }, [voice.isPlaying, voice.status.value, voice.mute, voice.unmute]);
-
-  return {
-    isMuted,
+export function useMicControl({
+  partNumber,
+}: {
+  partNumber: number;
+}): MicControl {
+  const {
     status,
+    isMuted,
+    unmute,
+    mute,
     micFft,
-    handleMuteToggle,
     disconnect,
-  };
+    isPlaying,
+    messages,
+  } = useVoice();
+
+  // Memoize the check function since it's a static operation
+  const shouldUnmuteUser = useMemo(
+    () =>
+      (content: string): boolean =>
+        content.toLowerCase().includes(UNMUTE_TRIGGER_PHRASE),
+    []
+  );
+
+  const handleMuteToggle = useCallback(() => {
+    if (isMuted) {
+      unmute();
+    } else {
+      mute();
+    }
+  }, [isMuted, unmute, mute]);
+
+  // Split the effect into two separate effects for better control
+  useEffect(() => {
+    if (!status?.value || typeof status.value !== 'string') return;
+
+    if (isPlaying) {
+      mute();
+    } else if (status.value === 'connected' && partNumber !== 2) {
+      unmute();
+    }
+  }, [isPlaying, status?.value, mute, unmute, partNumber]);
+
+  useEffect(() => {
+    const lastMessage = messages[messages.length - 1] as TMessage | undefined;
+    if (
+      lastMessage?.message?.content &&
+      shouldUnmuteUser(lastMessage.message.content)
+    ) {
+      unmute();
+    }
+  }, [messages, shouldUnmuteUser, unmute]);
+
+  // Memoize the return object to prevent unnecessary re-renders
+  return useMemo(
+    () => ({
+      isMuted,
+      status: status as VoiceStatus,
+      micFft,
+      handleMuteToggle,
+      disconnect,
+    }),
+    [isMuted, status, micFft, handleMuteToggle, disconnect]
+  );
 }
