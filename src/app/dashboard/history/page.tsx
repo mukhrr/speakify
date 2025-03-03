@@ -3,9 +3,20 @@
 import { useExamResults } from '@/hooks/useExamResults';
 import { useAuth } from '@/hooks/use-auth';
 import { format } from 'date-fns';
-import { CheckCircle2, Loader2, Clock } from 'lucide-react';
+import {
+  CheckCircle2,
+  Loader2,
+  Clock,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 
 export default function HistoryPage() {
   const { testHistory, isLoading } = useExamResults();
@@ -142,27 +153,42 @@ export default function HistoryPage() {
               </div>
 
               {test.status === 'completed' && (
-                <div className="mt-4 rounded-md border bg-muted/30 p-4">
-                  <p className="mb-2 font-medium">Feedback</p>
-                  <div className="space-y-2">
-                    {[test.part1, test.part2, test.part3].map(
-                      (part, index) =>
-                        part &&
-                        part.feedback.length > 0 && (
-                          <div key={index}>
-                            <p className="text-sm font-medium text-muted-foreground">
-                              Part {index + 1}:
-                            </p>
-                            <ul className="ml-4 list-disc space-y-1 text-sm">
-                              {part.feedback.map((item, i) => (
-                                <li key={i}>{item}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        )
-                    )}
+                <Collapsible defaultOpen>
+                  <div className="mt-4 flex items-center justify-between rounded-md border bg-muted/30 p-4">
+                    <p className="font-medium">Feedback</p>
+                    <CollapsibleTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="group h-8 w-8 p-0"
+                      >
+                        <ChevronUp className="hidden h-4 w-4 transition-transform duration-200 group-data-[state=open]:block" />
+                        <ChevronDown className="block h-4 w-4 transition-transform duration-200 group-data-[state=open]:hidden" />
+                        <span className="sr-only">Toggle feedback</span>
+                      </Button>
+                    </CollapsibleTrigger>
                   </div>
-                </div>
+                  <CollapsibleContent>
+                    <div className="space-y-2 rounded-b-md border border-t-0 bg-muted/30 p-4">
+                      {[test.part1, test.part2, test.part3].map(
+                        (part, index) =>
+                          part &&
+                          part.feedback.length > 0 && (
+                            <div key={index}>
+                              <p className="text-sm font-medium text-muted-foreground">
+                                Part {index + 1}:
+                              </p>
+                              <ul className="ml-4 list-disc space-y-1 text-sm">
+                                {part.feedback.map((item, i) => (
+                                  <li key={i}>{item}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )
+                      )}
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
               )}
             </div>
           ))}

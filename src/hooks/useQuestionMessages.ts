@@ -22,7 +22,8 @@ export const useQuestionMessages = (partNumber: 1 | 2 | 3) => {
       content.includes('where') ||
       content.includes('which') ||
       content.includes('do you') ||
-      content.includes('describe')
+      content.includes('describe') ||
+      content.includes('who')
     );
   });
 

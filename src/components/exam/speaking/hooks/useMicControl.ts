@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useMemo } from 'react';
+import { useEffect, useCallback, useMemo, useState } from 'react';
 import { useVoice } from '@humeai/voice-react';
 import { TMessage } from './useVoiceControl';
 
@@ -33,6 +33,7 @@ export function useMicControl({
     isPlaying,
     messages,
   } = useVoice();
+  const [canForceUnMute, setCanForceUnMute] = useState(false);
 
   // Memoize the check function since it's a static operation
   const shouldUnmuteUser = useMemo(
@@ -56,10 +57,13 @@ export function useMicControl({
 
     if (isPlaying) {
       mute();
-    } else if (status.value === 'connected' && partNumber !== 2) {
+    } else if (
+      (status.value === 'connected' && partNumber !== 2) ||
+      canForceUnMute
+    ) {
       unmute();
     }
-  }, [isPlaying, status?.value, mute, unmute, partNumber]);
+  }, [isPlaying, status?.value, mute, unmute, partNumber, canForceUnMute]);
 
   // Automatically mute/unmute mic based on AI speaking status
   useEffect(() => {
@@ -68,6 +72,7 @@ export function useMicControl({
       lastMessage?.message?.content &&
       shouldUnmuteUser(lastMessage.message.content)
     ) {
+      setCanForceUnMute(true);
       unmute();
     }
   }, [messages, shouldUnmuteUser, unmute]);
